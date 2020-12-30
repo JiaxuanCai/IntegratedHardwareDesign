@@ -24,6 +24,14 @@ module alu(
 			`EXE_NOR_OP:y<=~(a|b);
 			`EXE_LUI_OP:y<={b[15:0],16'b0};
 			//移位指令
+			//错误：'a' is not a constant
+			//`EXE_SLL_OP:y<={b[31-sa:0],zerowire[sa:0]};
+			`EXE_SLL_OP:y<=b<<sa;
+			`EXE_SRL_OP:y<=b>>sa;
+			`EXE_SRA_OP:y<=($signed(b))>>>sa;
+			`EXE_SLLV_OP:y<=b<<a;
+			`EXE_SRLV_OP:y<=b>>a;
+			`EXE_SRAV_OP:y<=($signed(b))>>>a;
 			//数据移动指令
 			//算数运算指令
 			`EXE_ADD_OP,`EXE_ADDI_OP,`EXE_SW_OP,`EXE_LW_OP:y <= s;

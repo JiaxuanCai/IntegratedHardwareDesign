@@ -16,6 +16,14 @@ module aludec(
 			`EXE_XOR:alucontrol <=`EXE_XOR_OP;
 			`EXE_NOR:alucontrol <=`EXE_NOR_OP;
 			//移位指令
+			`EXE_SLL:alucontrol <=`EXE_SLL_OP;
+			`EXE_SRL:alucontrol <=`EXE_SRL_OP;
+			`EXE_SRA:alucontrol <=`EXE_SRA_OP;
+			`EXE_SLLV:alucontrol <=`EXE_SLLV_OP;
+			`EXE_SRLV:alucontrol <=`EXE_SRLV_OP;
+			///////////////////////////////////
+			//错误，写错了
+			`EXE_SRAV:alucontrol <=`EXE_SRAV_OP;
 			//数据移动指令
 			//算数运算指令
 			`EXE_ADD:alucontrol <= `EXE_ADD_OP;
@@ -25,7 +33,7 @@ module aludec(
 			//访存指令
 			//内陷指令
 			//特权指令
-			default:alucontrol <= 9'b0000000;
+			default:alucontrol <= 8'b0;
 		endcase
 		end
 		else begin
