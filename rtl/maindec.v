@@ -7,7 +7,8 @@ module maindec(
 	output wire memtoreg,memen,memwrite,
 	output wire branch,alusrc,
 	output wire regdst,regwrite,
-	output wire jump,jal,jr,bal
+	output wire jump,jal,jr,bal,
+	output reg HLwrite
 	//output wire[1:0] aluop
     );
 	reg[7:0] controls;
@@ -48,6 +49,18 @@ module maindec(
 			//特权指令
 			default:  controls <= 7'b0000000;
 		endcase
+		end
+	end
+
+	//HLwrite的逻辑
+	always@(*)begin
+		HLwrite<=0;
+		if(op==`EXE_NOP)begin
+			case(funct)
+			`EXE_MTHI:HLwrite<=1;
+			`EXE_MTLO:HLwrite<=1;
+			default:HLwrite<=0;
+			endcase
 		end
 	end
 endmodule

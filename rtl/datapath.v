@@ -24,12 +24,14 @@ module datapath(
 	//内存访问级信号
 	input wire memtoregM,//内存操作级的存储器写寄存器控制信号
 	input wire regwriteM,//访问内存级控制是否写入寄存器
+	input wire HLwriteM,
 	output wire[31:0] aluoutM,writedataM,//运算级的运算结果//待写回内存的值
 	input wire[31:0] readdataM,//内存级读出的数据
 
 	//写回级信号
 	input wire memtoregW,//写回级的存储器写寄存器控制信号
 	input wire regwriteW, //写回级读出的数据
+	input wire HLwriteW,
 
 	output wire [4:0] rsE,rtE,rdE,
 	output wire [4:0] rsD,rtD,rdD,
@@ -57,19 +59,24 @@ module datapath(
 
 	//运算级信号
 	wire [1:0] forwardaE,forwardbE;
+	wire forwardHLE;
 	
 	wire [4:0] saE;
 	wire [4:0] writeregE;
 	wire [31:0] signimmE;
 	wire [31:0] srcaE,srca2E,srcbE,srcb2E,srcb3E;
 	wire [31:0] aluoutE;
-
+	wire [63:0] aluHLsrc;
+	wire [63:0] HLOutE;
 	//内存访问级信号
 	wire [4:0] writeregM;
+	wire [63:0] HLOutM;
 
 	//写回级信号
 	wire [4:0] writeregW;
 	wire [31:0] aluoutW,readdataW,resultW;
+	wire [63:0] HLOutW;
+	wire [63:0] HLregW;
 
 	//冒险模块
 	hazard h(
@@ -94,11 +101,13 @@ module datapath(
 		.forwardaE(forwardaE),
 		.forwardbE(forwardbE),
 		.flushE(flushE),
+		.forwardHLE(forwardHLE),
 		
 		//内存访问级信号
 		.writeregM(writeregM),
 		.regwriteM(regwriteM),
 		.memtoregM(memtoregM),
+		.HLwriteM(HLwriteM),
 
 		//写回级信号
 		.writeregW(writeregW),
@@ -154,18 +163,25 @@ module datapath(
 
 	mux3 #(32) forwardaemux(srcaE,resultW,aluoutM,forwardaE,srca2E);
 	mux3 #(32) forwardbemux(srcbE,resultW,aluoutM,forwardbE,srcb2E);
+	mux2 #(64) forwardHLmux(HLregW,HLOutM,forwardHLE,aluHLsrc);
 	mux2 #(32) srcbmux(srcb2E,signimmE,alusrcE,srcb3E);
-	alu alu(srca2E,srcb3E,alucontrolE,saE,aluoutE);
+	//alu alu(srca2E,srcb3E,alucontrolE,saE,aluoutE);
+	//错误日志：未加入overflow、zero导致对齐错误
+	alu alu(srca2E,srcb3E,alucontrolE,saE,aluoutE,aluHLsrc[63:32],aluHLsrc[31:0],HLOutE[63:32],HLOutE[31:0]);
 	mux2 #(5) wrmux(rtE,rdE,regdstE,writeregE);
-
+	//错误日志：写成了floprc
 	//内存访问级信号触发器
 	flopr #(32) r1M(clk,rst,srcb2E,writedataM);
 	flopr #(32) r2M(clk,rst,aluoutE,aluoutM);
 	flopr #(5) r3M(clk,rst,writeregE,writeregM);
+	flopr #(64) r4M(clk,rst,HLOutE,HLOutM);
 
 	//写回级信号触发器
 	flopr #(32) r1W(clk,rst,aluoutM,aluoutW);
 	flopr #(32) r2W(clk,rst,readdataM,readdataW);
 	flopr #(5) r3W(clk,rst,writeregM,writeregW);
+	flopr #(64) r4W(clk,rst,HLOutM,HLOutW);
+	//HL寄存器
+	hilo_reg hilorrg(clk,rst,HLwriteW,HLOutW[63:32],HLOutW[31:0],HLregW[63:32],HLregW[31:0]);
 	mux2 #(32) resmux(aluoutW,readdataW,memtoregW,resultW);
 endmodule

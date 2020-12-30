@@ -18,11 +18,13 @@ module hazard(
 	input wire memtoregE,//指令执行级的存储器写寄存器控制信号
 	output reg[1:0] forwardaE,forwardbE,//指令执行级阶段数据前推rs 指令执行级阶段数据前推rt
 	output wire flushE,//指令运算级刷新信号
+	output wire forwardHLE,
 
 	//内存访问级信号
 	input wire[4:0] writeregM,//内存阶段写寄存器控制信号
 	input wire regwriteM,// 内存级控制是否写入寄存器
 	input wire memtoregM,//内存数据写到寄存器
+	input wire HLwriteM,
 
 	//写回级信号
 	input wire[4:0] writeregW,//写回阶段写寄存器控制信号
@@ -59,9 +61,11 @@ module hazard(
 				forwardbE = 2'b01;
 			end
 		end
+	
 		/////////////////////////////////////////////////////////////////////////////////////////结束
 	end
-
+	//如果在M阶段写，直接前推即可
+	assign forwardHLE=HLwriteM;
 	//取指令的暂停控制信号  （属于数据冒险模块）
 	assign #1 lwstallD = memtoregE & (rtE == rsD | rtE == rtD);
 

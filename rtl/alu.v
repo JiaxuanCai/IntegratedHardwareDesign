@@ -1,11 +1,16 @@
 `timescale 1ns / 1ps
 `include "defines.vh"
-
+/////////////////////////////////
+//alu辅助了一部分controller的逻辑
 module alu(
 	input wire[31:0] a,b,//第一个操作数和第二个操作数（rs、rt）（rs，imm）
 	input wire[7:0] op,
 	input wire[4:0] sa,
 	output reg[31:0] y,
+	input wire[31:0] HiInput,LoInput,
+	output reg [31:0] HiOutput,LoOutput,
+
+	
 	output reg overflow,
 	output wire zero
     );
@@ -16,6 +21,8 @@ module alu(
 	assign bout = subfunc ? ~b : b;
 	assign s = a + bout + subfunc;
 	always @(*) begin
+		HiOutput<=HiInput;
+		LoOutput<=LoOutput;
 		case(op)
 			//逻辑运算指令
 			`EXE_AND_OP,`EXE_ANDI_OP:y<=a&b;
@@ -33,6 +40,10 @@ module alu(
 			`EXE_SRLV_OP:y<=b>>a;
 			`EXE_SRAV_OP:y<=($signed(b))>>>a;
 			//数据移动指令
+			`EXE_MFHI_OP:y<=HiInput;
+			`EXE_MFLO_OP:y<=LoInput;
+			`EXE_MTHI_OP:HiOutput<=a;
+			`EXE_MTLO_OP:LoOutput<=a;
 			//算数运算指令
 			`EXE_ADD_OP,`EXE_ADDI_OP,`EXE_SW_OP,`EXE_LW_OP:y <= s;
 			`EXE_SUB_OP:y <= s;

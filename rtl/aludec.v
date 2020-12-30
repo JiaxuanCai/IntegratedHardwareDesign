@@ -25,6 +25,12 @@ module aludec(
 			//错误，写错了
 			`EXE_SRAV:alucontrol <=`EXE_SRAV_OP;
 			//数据移动指令
+			`EXE_MFHI:alucontrol <=`EXE_MFHI_OP;
+			`EXE_MFLO:alucontrol <=`EXE_MFLO_OP;
+			`EXE_MTHI:alucontrol <=`EXE_MTHI_OP;
+			`EXE_MTLO:alucontrol <=`EXE_MTLO_OP;
+
+
 			//算数运算指令
 			`EXE_ADD:alucontrol <= `EXE_ADD_OP;
 			`EXE_SUB:alucontrol <= `EXE_SUB_OP;
