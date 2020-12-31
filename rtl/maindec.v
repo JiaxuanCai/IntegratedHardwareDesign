@@ -7,7 +7,8 @@ module maindec(
 	output wire memtoreg,memen,memwrite,
 	output wire branch,alusrc,
 	output wire regdst,regwrite,
-	output wire jump,jal,jr,bal,
+	output wire jump,
+	output reg jal,jr,bal,
 	output reg HLwrite
 	//output wire[1:0] aluop
     );
@@ -16,6 +17,7 @@ module maindec(
 
 	//op觉得控制信号
 	always @(*) begin
+		jal<=0;jr<=0;bal<=0;
 		if(op==`EXE_NOP)begin
 			case(funct)
 			//TODO
@@ -25,6 +27,15 @@ module maindec(
 			//数据移动指令
 			//算数运算指令
 			//分支跳转指令
+			`EXE_JR:begin
+				controls <= 7'b0000001;
+				jr<=1;
+			end
+			`EXE_JALR:begin
+				controls <= 7'b1000001;
+				jr<=1;
+				jal<=1;
+			end
 			//访存指令
 			//内陷指令
 			//特权指令
@@ -40,8 +51,23 @@ module maindec(
 			//算数运算指令
 			`EXE_ADDI,`EXE_ADDIU,`EXE_SLTI,`EXE_SLTIU:controls <= 7'b1010000;
 			//分支跳转指令
-			`EXE_BEQ:controls <= 7'b0001000;
+			`EXE_BEQ,`EXE_BGTZ,`EXE_BLEZ,`EXE_BNE:controls <= 7'b0001000;
 			`EXE_J:controls <= 7'b0000001;
+			//使用了与ppt不一样的逻辑
+			`EXE_JAL:begin
+				controls <= 7'b1000001;
+				jal<=1;
+			end
+			`EXE_REGIMM_INST:begin
+				case(rt)
+				`EXE_BLTZ,`EXE_BGEZ:controls <= 7'b0001000;
+				`EXE_BLTZAL,`EXE_BGEZAL:begin
+					controls <= 7'b0001000;
+					bal<=1;
+				end
+				endcase
+			end
+
 			//访存指令
 			`EXE_LW:controls <= 7'b1010010;
 			`EXE_SW:controls <= 7'b0010100;

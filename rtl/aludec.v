@@ -48,6 +48,8 @@ module aludec(
 			`EXE_DIV:alucontrol <= `EXE_DIV_OP;
 			`EXE_DIVU:alucontrol <= `EXE_DIVU_OP;
 			//分支跳转指令
+			`EXE_JR:alucontrol <= `EXE_JR_OP;
+			`EXE_JALR:alucontrol <= `EXE_JALR_OP;
 			//访存指令
 			//内陷指令
 			//特权指令
@@ -70,7 +72,19 @@ module aludec(
 			`EXE_SLTIU:alucontrol <= `EXE_SLTIU_OP;
 			//分支跳转指令
 			`EXE_BEQ:alucontrol <= `EXE_BEQ_OP;
+			`EXE_BGTZ:alucontrol <= `EXE_BGTZ_OP;
+			`EXE_BLEZ:alucontrol <= `EXE_BLEZ_OP;
+			`EXE_BNE:alucontrol <= `EXE_BNE_OP;
+			`EXE_REGIMM_INST:begin
+				case(rt)
+				`EXE_BLTZ:alucontrol <= `EXE_BLTZ_OP;
+				`EXE_BGEZ:alucontrol <= `EXE_BGEZ_OP;
+				`EXE_BLTZAL:alucontrol <= `EXE_BLTZAL_OP;
+				`EXE_BGEZAL:alucontrol <= `EXE_BGEZAL_OP;
+				endcase
+			end
 			`EXE_J:alucontrol <= `EXE_J_OP;
+			`EXE_JAL:alucontrol <= `EXE_JAL_OP;
 			//访存指令
 			`EXE_LW:alucontrol <= `EXE_LW_OP;
 			`EXE_SW:alucontrol <= `EXE_SW_OP;

@@ -10,9 +10,10 @@ module datapath(
 
 	//指令译码阶段信号
 	input wire pcsrcD,branchD, //译码阶段地址来源 与 条件跳转指令，相等则分支
-	input wire jumpD,//无条件跳转指令地址
-	output wire equalD,//两个寄存器源操作数相等则有效
-	output wire[5:0] opD,functD,// 指令的操作码字段 //指令的功能码字段
+	input wire jumpD,jrD,//无条件跳转指令地址
+	
+	output wire brRest,//两个寄存器源操作数相等则有效
+	output wire[5:0] opD,functD,// 指令的操作码字段 
 	output wire [4:0] InstrRtD,
 	//运算级信号
 	input wire memtoregE,//指令执行级的存储器写寄存器控制信号
@@ -34,7 +35,7 @@ module datapath(
 	//写回级信号
 	input wire memtoregW,//写回级的存储器写寄存器控制信号
 	input wire regwriteW, //写回级读出的数据
-	input wire HLwriteW,
+	input wire HLwriteW,BJalW,
 	output wire flushW,
 
 	output wire [4:0] rsE,rtE,rdE,
@@ -63,6 +64,7 @@ module datapath(
 
 	//运算级信号
 	wire [1:0] forwardaE,forwardbE;
+	wire [31:0] pcplus4E;
 	wire forwardHLE;
 	wire mut_div_stallE;
 	wire stallE;
@@ -78,13 +80,16 @@ module datapath(
 	//内存访问级信号
 	wire [4:0] writeregM;
 	wire [63:0] HLOutM;
+	wire [31:0] pcplus4M;
 	wire stallM,flushM;
+	
 
 	//写回级信号
 	wire [4:0] writeregW;
 	wire [31:0] aluoutW,readdataW,resultW;
 	wire [63:0] HLOutW;
 	wire [63:0] HLregW;
+	wire [31:0] pcplus4W;
 	wire stallW,flushW;
 
 	//冒险模块
@@ -134,8 +139,12 @@ module datapath(
 
 	//下一个指令地址计算
 	mux2 #(32) pcbrmux(pcplus4F,pcbranchD,pcsrcD,pcnextbrFD);  //地址计算部分
-	mux2 #(32) pcmux(pcnextbrFD, {pcplus4D[31:28],instrD[25:0],2'b00}, jumpD, pcnextFD);  //地址计算部分
-
+	//mux2 #(32) pcmux(pcnextbrFD, {pcplus4D[31:28],instrD[25:0],2'b00}, jumpD, pcnextFD);  //地址计算部分
+	//jr为1直接跳寄存器值，否则如果jump为1跳拼接值，否则正常+4
+	//错误：必须选择数据前推后的srca2D
+	assign pcnextFD=jrD?srca2D:
+						jumpD?{pcplus4D[31:28],instrD[25:0],2'b00}:pcnextbrFD;
+	
 	//寄存器访问
 	regfile rf(clk,regwriteW,rsD,rtD,writeregW,resultW,srcaD,srcbD);
 
@@ -156,7 +165,8 @@ module datapath(
 
 	mux2 #(32) forwardamux(srcaD,aluoutM,forwardaD,srca2D);
 	mux2 #(32) forwardbmux(srcbD,aluoutM,forwardbD,srcb2D);
-	eqcmp comp(srca2D,srcb2D,equalD);
+	//eqcmp comp(srca2D,srcb2D,equalD);
+	BranchDec brdecode(srca2D,srcb2D,alucontrolD,brRest);
 
 	assign opD = instrD[31:26];
 	assign functD = instrD[5:0];
@@ -174,6 +184,7 @@ module datapath(
 	flopenrc#(5) r5E(clk,rst,~stallE,flushE,rtD,rtE);
 	flopenrc#(5) r6E(clk,rst,~stallE,flushE,rdD,rdE);
 	flopenrc#(5) r7E(clk,rst,~stallE,flushE,saD,saE);
+	flopenrc#(32) r8E(clk,rst,~stallE,flushE,pcplus4D,pcplus4E);
 
 	mux3 #(32) forwardaemux(srcaE,resultW,aluoutM,forwardaE,srca2E);
 	mux3 #(32) forwardbemux(srcbE,resultW,aluoutM,forwardbE,srcb2E);
@@ -190,13 +201,19 @@ module datapath(
 	flopenrc #(32) r2M(clk,rst,~stallM,flushM,aluoutE,aluoutM);
 	flopenrc #(5) r3M(clk,rst,~stallM,flushM,writeregE,writeregM);
 	flopenrc #(64) r4M(clk,rst,~stallM,flushM,HLOutE,HLOutM);
+	flopenrc#(32) r5M(clk,rst,~stallM,flushM,pcplus4E,pcplus4M);
 
 	//写回级信号触发器
 	flopenrc #(32) r1W(clk,rst,~stallW,flushW,aluoutM,aluoutW);
 	flopenrc #(32) r2W(clk,rst,~stallW,flushW,readdataM,readdataW);
 	flopenrc #(5) r3W(clk,rst,~stallW,flushW,writeregM,writeregW);
 	flopenrc #(64) r4W(clk,rst,~stallW,flushW,HLOutM,HLOutW);
+	flopenrc#(32) r5W(clk,rst,~stallW,flushW,pcplus4M,pcplus4W);
 	//HL寄存器
 	hilo_reg hilorrg(clk,rst,HLwriteW,HLOutW[63:32],HLOutW[31:0],HLregW[63:32],HLregW[31:0]);
-	mux2 #(32) resmux(aluoutW,readdataW,memtoregW,resultW);
+	wire [31:0]resultSrc0W;
+	wire [31:0]pcplus8W;
+	assign pcplus8W=pcplus4W+4;
+	mux2 #(32) resmux(aluoutW,readdataW,memtoregW,resultSrc0W);
+	mux2 #(32) resmux2(resultSrc0W,pcplus8W,BJalW,resultW);
 endmodule
