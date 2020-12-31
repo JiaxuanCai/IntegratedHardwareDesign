@@ -32,9 +32,21 @@ module aludec(
 
 
 			//算数运算指令
+			//错误：忘了加SLTI\ADDI
 			`EXE_ADD:alucontrol <= `EXE_ADD_OP;
+			`EXE_ADDI:alucontrol <= `EXE_ADDI_OP;
+			`EXE_ADDU:alucontrol <= `EXE_ADDU_OP;
+			`EXE_ADDIU:alucontrol <= `EXE_ADDIU_OP;
 			`EXE_SUB:alucontrol <= `EXE_SUB_OP;
+			`EXE_SUBU:alucontrol <= `EXE_SUBU_OP;
 			`EXE_SLT:alucontrol <= `EXE_SLT_OP;
+			`EXE_SLTI:alucontrol <= `EXE_SLTI_OP;
+			`EXE_SLTU:alucontrol <= `EXE_SLTU_OP;
+			`EXE_SLTIU:alucontrol <= `EXE_SLTIU_OP;
+			`EXE_MULT:alucontrol <= `EXE_MULT_OP;
+			`EXE_MULTU:alucontrol <= `EXE_MULTU_OP;
+			`EXE_DIV:alucontrol <= `EXE_DIV_OP;
+			`EXE_DIVU:alucontrol <= `EXE_DIVU_OP;
 			//分支跳转指令
 			//访存指令
 			//内陷指令
@@ -53,7 +65,9 @@ module aludec(
 			//数据移动指令
 			//算数运算指令
 			`EXE_ADDI:alucontrol <= `EXE_ADDI_OP;
-			
+			`EXE_ADDIU:alucontrol <= `EXE_ADDIU_OP;
+			`EXE_SLTI:alucontrol <= `EXE_SLTI_OP;
+			`EXE_SLTIU:alucontrol <= `EXE_SLTIU_OP;
 			//分支跳转指令
 			`EXE_BEQ:alucontrol <= `EXE_BEQ_OP;
 			`EXE_J:alucontrol <= `EXE_J_OP;

@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="testbench_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="glbl" />
+            <top_module name="testbench" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="3264300fs"></ZoomStartTime>
+      <ZoomEndTime time="3468901fs"></ZoomEndTime>
+      <Cursor1Time time="3502100fs"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="270"></NameColumnWidth>
+      <ValueColumnWidth column_width="172"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="49" />
+   <wvobject fp_name="/testbench/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/rst" type="logic">
+      <obj_property name="ElementShortName">rst</obj_property>
+      <obj_property name="ObjectShortName">rst</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/writedata" type="array">
+      <obj_property name="ElementShortName">writedata[31:0]</obj_property>
+      <obj_property name="ObjectShortName">writedata[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dataadr" type="array">
+      <obj_property name="ElementShortName">dataadr[31:0]</obj_property>
+      <obj_property name="ObjectShortName">dataadr[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/instr" type="array">
+      <obj_property name="ElementShortName">instr[31:0]</obj_property>
+      <obj_property name="ObjectShortName">instr[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/pc" type="array">
+      <obj_property name="ElementShortName">pc[31:0]</obj_property>
+      <obj_property name="ObjectShortName">pc[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/readdata" type="array">
+      <obj_property name="ElementShortName">readdata[31:0]</obj_property>
+      <obj_property name="ObjectShortName">readdata[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/memwrite" type="logic">
+      <obj_property name="ElementShortName">memwrite</obj_property>
+      <obj_property name="ObjectShortName">memwrite</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/lwstallD" type="logic">
+      <obj_property name="ElementShortName">lwstallD</obj_property>
+      <obj_property name="ObjectShortName">lwstallD</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/branchstallD" type="logic">
+      <obj_property name="ElementShortName">branchstallD</obj_property>
+      <obj_property name="ObjectShortName">branchstallD</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/rsE" type="array">
+      <obj_property name="ElementShortName">rsE[4:0]</obj_property>
+      <obj_property name="ObjectShortName">rsE[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/rtE" type="array">
+      <obj_property name="ElementShortName">rtE[4:0]</obj_property>
+      <obj_property name="ObjectShortName">rtE[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/rdE" type="array">
+      <obj_property name="ElementShortName">rdE[4:0]</obj_property>
+      <obj_property name="ObjectShortName">rdE[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/rsD" type="array">
+      <obj_property name="ElementShortName">rsD[4:0]</obj_property>
+      <obj_property name="ObjectShortName">rsD[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/rtD" type="array">
+      <obj_property name="ElementShortName">rtD[4:0]</obj_property>
+      <obj_property name="ObjectShortName">rtD[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/rdD" type="array">
+      <obj_property name="ElementShortName">rdD[4:0]</obj_property>
+      <obj_property name="ObjectShortName">rdD[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/stallF" type="logic">
+      <obj_property name="ElementShortName">stallF</obj_property>
+      <obj_property name="ObjectShortName">stallF</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/flushE" type="logic">
+      <obj_property name="ElementShortName">flushE</obj_property>
+      <obj_property name="ObjectShortName">flushE</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/stallD" type="logic">
+      <obj_property name="ElementShortName">stallD</obj_property>
+      <obj_property name="ObjectShortName">stallD</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/alu/clr_mut_div" type="logic">
+      <obj_property name="ElementShortName">clr_mut_div</obj_property>
+      <obj_property name="ObjectShortName">clr_mut_div</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/alu/HiOutput" type="array">
+      <obj_property name="ElementShortName">HiOutput[31:0]</obj_property>
+      <obj_property name="ObjectShortName">HiOutput[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/alu/LoOutput" type="array">
+      <obj_property name="ElementShortName">LoOutput[31:0]</obj_property>
+      <obj_property name="ObjectShortName">LoOutput[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/alu/HL_div" type="array">
+      <obj_property name="ElementShortName">HL_div[63:0]</obj_property>
+      <obj_property name="ObjectShortName">HL_div[63:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/alu/a" type="array">
+      <obj_property name="ElementShortName">a[31:0]</obj_property>
+      <obj_property name="ObjectShortName">a[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/alu/b" type="array">
+      <obj_property name="ElementShortName">b[31:0]</obj_property>
+      <obj_property name="ObjectShortName">b[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/alu/clr_mut_div" type="logic">
+      <obj_property name="ElementShortName">clr_mut_div</obj_property>
+      <obj_property name="ObjectShortName">clr_mut_div</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/alu/div_ready" type="logic">
+      <obj_property name="ElementShortName">div_ready</obj_property>
+      <obj_property name="ObjectShortName">div_ready</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/alu/stall_div" type="logic">
+      <obj_property name="ElementShortName">stall_div</obj_property>
+      <obj_property name="ObjectShortName">stall_div</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/alu/start_div" type="logic">
+      <obj_property name="ElementShortName">start_div</obj_property>
+      <obj_property name="ObjectShortName">start_div</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/rf/rf[1]" type="array">
+      <obj_property name="ElementShortName">[1][31:0]</obj_property>
+      <obj_property name="ObjectShortName">[1][31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/rf/rf[2]" type="array">
+      <obj_property name="ElementShortName">[2][31:0]</obj_property>
+      <obj_property name="ObjectShortName">[2][31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/rf/rf[3]" type="array">
+      <obj_property name="ElementShortName">[3][31:0]</obj_property>
+      <obj_property name="ObjectShortName">[3][31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/hilorrg/hi_o" type="array">
+      <obj_property name="ElementShortName">hi_o[31:0]</obj_property>
+      <obj_property name="ObjectShortName">hi_o[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/hilorrg/lo_o" type="array">
+      <obj_property name="ElementShortName">lo_o[31:0]</obj_property>
+      <obj_property name="ObjectShortName">lo_o[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/hilorrg/hi_o" type="array">
+      <obj_property name="ElementShortName">hi_o[31:0]</obj_property>
+      <obj_property name="ObjectShortName">hi_o[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/hilorrg/we" type="logic">
+      <obj_property name="ElementShortName">we</obj_property>
+      <obj_property name="ObjectShortName">we</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/hilorrg/lo" type="array">
+      <obj_property name="ElementShortName">lo[31:0]</obj_property>
+      <obj_property name="ObjectShortName">lo[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/hilorrg/hi" type="array">
+      <obj_property name="ElementShortName">hi[31:0]</obj_property>
+      <obj_property name="ObjectShortName">hi[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/alu/HiOutput" type="array">
+      <obj_property name="ElementShortName">HiOutput[31:0]</obj_property>
+      <obj_property name="ObjectShortName">HiOutput[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/alu/LoOutput" type="array">
+      <obj_property name="ElementShortName">LoOutput[31:0]</obj_property>
+      <obj_property name="ObjectShortName">LoOutput[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/alu/is_mut" type="logic">
+      <obj_property name="ElementShortName">is_mut</obj_property>
+      <obj_property name="ObjectShortName">is_mut</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/alu/multOut" type="array">
+      <obj_property name="ElementShortName">multOut[63:0]</obj_property>
+      <obj_property name="ObjectShortName">multOut[63:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/alu/mult_a" type="array">
+      <obj_property name="ElementShortName">mult_a[31:0]</obj_property>
+      <obj_property name="ObjectShortName">mult_a[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/alu/mult_b" type="array">
+      <obj_property name="ElementShortName">mult_b[31:0]</obj_property>
+      <obj_property name="ObjectShortName">mult_b[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/alu/mult_count" type="array">
+      <obj_property name="ElementShortName">mult_count[3:0]</obj_property>
+      <obj_property name="ObjectShortName">mult_count[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/alu/mut_div_stall" type="logic">
+      <obj_property name="ElementShortName">mut_div_stall</obj_property>
+      <obj_property name="ObjectShortName">mut_div_stall</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/alu/mut_ready" type="logic">
+      <obj_property name="ElementShortName">mut_ready</obj_property>
+      <obj_property name="ObjectShortName">mut_ready</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/alu/stall_mut" type="logic">
+      <obj_property name="ElementShortName">stall_mut</obj_property>
+      <obj_property name="ObjectShortName">stall_mut</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/alu/start_mut" type="logic">
+      <obj_property name="ElementShortName">start_mut</obj_property>
+      <obj_property name="ObjectShortName">start_mut</obj_property>
+   </wvobject>
+</wave_config>

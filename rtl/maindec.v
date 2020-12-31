@@ -38,7 +38,7 @@ module maindec(
 			//移位指令
 			//数据移动指令
 			//算数运算指令
-			`EXE_ADDI:controls <= 7'b1010000;
+			`EXE_ADDI,`EXE_ADDIU,`EXE_SLTI,`EXE_SLTIU:controls <= 7'b1010000;
 			//分支跳转指令
 			`EXE_BEQ:controls <= 7'b0001000;
 			`EXE_J:controls <= 7'b0000001;
@@ -59,6 +59,10 @@ module maindec(
 			case(funct)
 			`EXE_MTHI:HLwrite<=1;
 			`EXE_MTLO:HLwrite<=1;
+			`EXE_MULT:HLwrite<=1;
+			`EXE_MULTU:HLwrite<=1;
+			`EXE_DIV:HLwrite<=1;
+			`EXE_DIVU:HLwrite<=1;
 			default:HLwrite<=0;
 			endcase
 		end

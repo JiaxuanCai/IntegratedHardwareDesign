@@ -8,6 +8,7 @@ module hazard(
 	//指令译码阶段信号
 	input wire[4:0] rsD,rtD,//指令译码阶段数据前推rs、rd寄存器
 	input wire branchD,//条件跳转指令，相等则分支
+	input wire jumpD,
 	output wire forwardaD,forwardbD,//指令译码阶段数据前推rs、rd
 	output wire stallD,//译码级暂停控制信号，低电位有效
 
@@ -19,16 +20,20 @@ module hazard(
 	output reg[1:0] forwardaE,forwardbE,//指令执行级阶段数据前推rs 指令执行级阶段数据前推rt
 	output wire flushE,//指令运算级刷新信号
 	output wire forwardHLE,
+	input wire mut_div_stallE,
+	output stallE,
 
 	//内存访问级信号
 	input wire[4:0] writeregM,//内存阶段写寄存器控制信号
 	input wire regwriteM,// 内存级控制是否写入寄存器
 	input wire memtoregM,//内存数据写到寄存器
 	input wire HLwriteM,
+	output stallM,flushM,
 
 	//写回级信号
 	input wire[4:0] writeregW,//写回阶段写寄存器控制信号
 	input wire regwriteW,//写回级控制是否写入寄存器
+	output stallW,flushW,
 
 	output lwstallD,branchstallD
 );
@@ -73,12 +78,28 @@ module hazard(
 	assign #1 branchstallD = branchD & ( regwriteE  &  (writeregE == rsD | writeregE == rtD)  |  memtoregM & (writeregM == rsD | writeregM == rtD) );
 
     //F级暂停
-	assign #1 stallF = lwstallD | branchstallD;
+	assign #1 stallF = stallD;
 
     //D级暂停
-	assign #1 stallD = lwstallD | branchstallD;
+	assign #1 stallD = lwstallD | branchstallD|mut_div_stallE;
+
+	//E级暂停
+	assign #1 stallE=mut_div_stallE;
+
+	//M级暂停
+	assign #1 stallM=0;
+	
+	//W级暂停
+	assign #1 stallW=0;
+
 
 	//E级刷新
-	assign #1 flushE = lwstallD | branchstallD;
+	assign #1 flushE = lwstallD | branchstallD|jumpD;
+
+	//M级刷新
+	assign #1 flushM=0;
+	
+	//W级刷新
+	assign #1 flushW=0;
 
 endmodule
