@@ -11,15 +11,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="556850fs"></ZoomStartTime>
-      <ZoomEndTime time="845251fs"></ZoomEndTime>
-      <Cursor1Time time="612380fs"></Cursor1Time>
+      <ZoomStartTime time="930050fs"></ZoomStartTime>
+      <ZoomEndTime time="1219451fs"></ZoomEndTime>
+      <Cursor1Time time="1043850fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="194"></NameColumnWidth>
-      <ValueColumnWidth column_width="73"></ValueColumnWidth>
+      <NameColumnWidth column_width="190"></NameColumnWidth>
+      <ValueColumnWidth column_width="72"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="49" />
+   <WVObjectSize size="47" />
    <wvobject fp_name="/testbench/clk" type="logic">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
@@ -184,14 +184,6 @@
    <wvobject fp_name="/testbench/dut/mips/dp/brdecode/op" type="array">
       <obj_property name="ElementShortName">op[7:0]</obj_property>
       <obj_property name="ObjectShortName">op[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/testbench/dut/mips/dp/brdecode/rs" type="array">
-      <obj_property name="ElementShortName">rs[31:0]</obj_property>
-      <obj_property name="ObjectShortName">rs[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/testbench/dut/mips/dp/brdecode/rt" type="array">
-      <obj_property name="ElementShortName">rt[31:0]</obj_property>
-      <obj_property name="ObjectShortName">rt[31:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/testbench/dut/mips/dp/brdecode/y" type="logic">
       <obj_property name="ElementShortName">y</obj_property>

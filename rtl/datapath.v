@@ -30,7 +30,7 @@ module datapath(
 	//内存访问级信号
 	input wire memtoregM,//内存操作级的存储器写寄存器控制信号
 	input wire regwriteM,//访问内存级控制是否写入寄存器
-	input wire HLwriteM,
+	input wire HLwriteM,BJalM,
 	output wire[31:0] aluoutM,writedataM,//运算级的运算结果//待写回内存的值
 	input wire[31:0] readdataM,//内存级读出的数据
 	output wire flushM,
@@ -38,7 +38,7 @@ module datapath(
 	//写回级信号
 	input wire memtoregW,//写回级的存储器写寄存器控制信号
 	input wire regwriteW, //写回级读出的数据
-	input wire HLwriteW,BJalW,
+	input wire HLwriteW,
 	output wire flushW,
 
 	output wire [4:0] rsE,rtE,rdE,
@@ -204,24 +204,27 @@ module datapath(
 	mux2 #(5) wr2mux(writeregEsrc1,31,writeTo31E,writeregE);
 	assign clr_mut_divE=0;
 	//错误日志：写成了floprc
+	
 	//内存访问级信号触发器
+	wire [31:0]aluoutMsrc;
 	flopenrc #(32) r1M(clk,rst,~stallM,flushM,srcb2E,writedataM);
-	flopenrc #(32) r2M(clk,rst,~stallM,flushM,aluoutE,aluoutM);
+	flopenrc #(32) r2M(clk,rst,~stallM,flushM,aluoutE,aluoutMsrc);
 	flopenrc #(5) r3M(clk,rst,~stallM,flushM,writeregE,writeregM);
 	flopenrc #(64) r4M(clk,rst,~stallM,flushM,HLOutE,HLOutM);
 	flopenrc#(32) r5M(clk,rst,~stallM,flushM,pcplus4E,pcplus4M);
+	wire [31:0]pcplus8M;
+	assign pcplus8M=pcplus4M+4;
+	mux2 #(32) resmux2(aluoutMsrc,pcplus8M,BJalM,aluoutM);
 
 	//写回级信号触发器
 	flopenrc #(32) r1W(clk,rst,~stallW,flushW,aluoutM,aluoutW);
 	flopenrc #(32) r2W(clk,rst,~stallW,flushW,readdataM,readdataW);
 	flopenrc #(5) r3W(clk,rst,~stallW,flushW,writeregM,writeregW);
 	flopenrc #(64) r4W(clk,rst,~stallW,flushW,HLOutM,HLOutW);
-	flopenrc#(32) r5W(clk,rst,~stallW,flushW,pcplus4M,pcplus4W);
 	//HL寄存器
 	hilo_reg hilorrg(clk,rst,HLwriteW,HLOutW[63:32],HLOutW[31:0],HLregW[63:32],HLregW[31:0]);
-	wire [31:0]resultSrc0W;
-	wire [31:0]pcplus8W;
-	assign pcplus8W=pcplus4W+4;
-	mux2 #(32) resmux(aluoutW,readdataW,memtoregW,resultSrc0W);
-	mux2 #(32) resmux2(resultSrc0W,pcplus8W,BJalW,resultW);
+
+	
+	mux2 #(32) resmux(aluoutW,readdataW,memtoregW,resultW);
+	
 endmodule

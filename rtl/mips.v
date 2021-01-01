@@ -29,7 +29,7 @@ module mips(
 	wire [7:0] alucontrolE;
 	wire flushE,equalD;
 	wire stallD,stallE,stallM,stallW,flushM,flushW;
-	wire writeTo31E;
+	wire writeTo31E,BJalM;
 
 	controller c(
 		clk,rst,
@@ -48,11 +48,11 @@ module mips(
 
 		//内存访问级信号
 		memtoregM,memwriteM,
-		regwriteM,HLwriteM,
+		regwriteM,HLwriteM,BJalM,
 		stallM,flushM,
 		//写回级信号
 		memtoregW,regwriteW,
-		HLwriteW,BJalW,stallW,flushW
+		HLwriteW,stallW,flushW
 	);
 
 	datapath dp(
@@ -76,7 +76,7 @@ module mips(
 		//内存访问级信号
 		memtoregM,
 		regwriteM,
-		HLwriteM,
+		HLwriteM,BJalM,
 		aluoutM,writedataM,
 		readdataM,
 		flushM,
@@ -84,7 +84,6 @@ module mips(
 		memtoregW,
 		regwriteW,
 		HLwriteW,
-		BJalW,
 		flushW,
 		rsE,rtE,rdE,
 	    rsD,rtD,rdD,

@@ -19,11 +19,11 @@ module controller(
 	output wire[7:0] alucontrolE,
 
 	//mem stage
-	output wire memtoregM,memwriteM,regwriteM,HLwriteM,
+	output wire memtoregM,memwriteM,regwriteM,HLwriteM,BJalM,
 	input wire stallM,flushM,
 	
 	//write back stage
-	output wire memtoregW,regwriteW,HLwriteW,BJalW,
+	output wire memtoregW,regwriteW,HLwriteW,
 	input wire stallW,flushW
 
 );
