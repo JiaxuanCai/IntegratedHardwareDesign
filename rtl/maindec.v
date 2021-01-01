@@ -73,8 +73,8 @@ module maindec(
 			end
 
 			//访存指令
-			`EXE_LW:controls <= 7'b1010010;
-			`EXE_SW:controls <= 7'b0010100;
+			`EXE_LW,`EXE_LB,`EXE_LBU,`EXE_LH,`EXE_LHU,`EXE_LW:controls <= 7'b1010010;
+			`EXE_SW,`EXE_SB,`EXE_SH:controls <= 7'b0010100;
 			//内陷指令
 			//特权指令
 			default:  controls <= 7'b0000000;

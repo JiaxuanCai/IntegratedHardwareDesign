@@ -87,8 +87,15 @@ module aludec(
 			`EXE_J:alucontrol <= `EXE_J_OP;
 			`EXE_JAL:alucontrol <= `EXE_JAL_OP;
 			//访存指令
+			//错误：忘了加op
 			`EXE_LW:alucontrol <= `EXE_LW_OP;
+			`EXE_LB:alucontrol<=`EXE_LB_OP;
+			`EXE_LBU:alucontrol<=`EXE_LBU_OP;
+			`EXE_LH:alucontrol<=`EXE_LH_OP;
+			`EXE_LHU:alucontrol<=`EXE_LHU_OP;
 			`EXE_SW:alucontrol <= `EXE_SW_OP;
+			`EXE_SB:alucontrol<=`EXE_SB_OP;
+			`EXE_SH:alucontrol<=`EXE_SH_OP;
 			//内陷指令
 			//特权指令
 			default:  alucontrol <= 9'b0000000;

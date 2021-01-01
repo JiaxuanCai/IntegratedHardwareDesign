@@ -20,6 +20,7 @@ module controller(
 
 	//mem stage
 	output wire memtoregM,memwriteM,regwriteM,HLwriteM,BJalM,
+	output wire[7:0]alucontrolM,
 	input wire stallM,flushM,
 	
 	//write back stage
@@ -67,12 +68,12 @@ module controller(
 		{memtoregD,memwriteD,alusrcD,regdstD,regwriteD,alucontrolD,HLwriteD,BJalD,writeTo31D},
 		{memtoregE,memwriteE,alusrcE,regdstE,regwriteE,alucontrolE,HLwriteE,BJalE,writeTo31E}
 	);
-
-	flopenrc #(8) regM(
+	//错误：流水线中变量写错，alucontrolM恒伟1
+	flopenrc #(16) regM(
 		clk,rst,~stallM,
 		flushM,
-		{memtoregE,memwriteE,regwriteE,HLwriteE,BJalE},
-		{memtoregM,memwriteM,regwriteM,HLwriteM,BJalM}
+		{memtoregE,memwriteE,regwriteE,HLwriteE,BJalE,alucontrolE},
+		{memtoregM,memwriteM,regwriteM,HLwriteM,BJalM,alucontrolM}
 	);
 
 	flopenrc #(8) regW(

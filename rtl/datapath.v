@@ -31,8 +31,10 @@ module datapath(
 	input wire memtoregM,//内存操作级的存储器写寄存器控制信号
 	input wire regwriteM,//访问内存级控制是否写入寄存器
 	input wire HLwriteM,BJalM,
-	output wire[31:0] aluoutM,writedataM,//运算级的运算结果//待写回内存的值
+	output wire[31:0] aluoutM,writedata_decodedM,//运算级的运算结果//待写回内存的值
+	input wire[7:0]alucontrolM,
 	input wire[31:0] readdataM,//内存级读出的数据
+	output wire [3:0]readEnM,writeEnM,
 	output wire flushM,
 
 	//写回级信号
@@ -40,6 +42,7 @@ module datapath(
 	input wire regwriteW, //写回级读出的数据
 	input wire HLwriteW,
 	output wire flushW,
+	
 
 	output wire [4:0] rsE,rtE,rdE,
 	output wire [4:0] rsD,rtD,rdD,
@@ -204,7 +207,7 @@ module datapath(
 	mux2 #(5) wr2mux(writeregEsrc1,31,writeTo31E,writeregE);
 	assign clr_mut_divE=0;
 	//错误日志：写成了floprc
-	
+	wire [31:0]writedataM;
 	//内存访问级信号触发器
 	wire [31:0]aluoutMsrc;
 	flopenrc #(32) r1M(clk,rst,~stallM,flushM,srcb2E,writedataM);
@@ -216,10 +219,15 @@ module datapath(
 	wire [31:0]pcplus8M;
 	assign pcplus8M=pcplus4M+4;
 	mux2 #(32) resmux2(aluoutMsrc,pcplus8M,BJalM,aluoutM);
+	//TODO
+	
+    wire[31:0]readdata_decodedM;
+    wire read_addr_errorM,wirte_addr_errorM;
+	memInsDecode memdec(alucontrolM,aluoutM[1:0],readdataM,writedataM,readdata_decodedM,writedata_decodedM,readEnM,writeEnM,read_addr_errorM,wirte_addr_errorM);
 
 	//写回级信号触发器
 	flopenrc #(32) r1W(clk,rst,~stallW,flushW,aluoutM,aluoutW);
-	flopenrc #(32) r2W(clk,rst,~stallW,flushW,readdataM,readdataW);
+	flopenrc #(32) r2W(clk,rst,~stallW,flushW,readdata_decodedM,readdataW);
 	flopenrc #(5) r3W(clk,rst,~stallW,flushW,writeregM,writeregW);
 	flopenrc #(64) r4W(clk,rst,~stallW,flushW,HLOutM,HLOutW);
 	//HL寄存器

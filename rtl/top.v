@@ -17,7 +17,7 @@ module top(
 );
 
 wire[31:0] pc,instr,readdata;
-
+wire [3:0] readEnM,writeEnM;
 //mips
 mips mips(
 	.clk(clk),
@@ -28,6 +28,7 @@ mips mips(
 	.aluoutM(dataadr),
 	.writedataM(writedata),
 	.readdataM(readdata),
+	.readEnM(readEnM),.writeEnM(writeEnM),
 	.rsE(rsE),.rtE(rtE),.rdE(rdE),
 	.rsD(rsD),.rtD(rtD),.rdD(rdD),
 
@@ -52,7 +53,7 @@ inst_mem imem (
 data_mem dmem (
   .clka(~clk),    // input wire clka
   .ena(memwrite),      // input wire ena
-  .wea({4{memwrite}}),      // input wire [3 : 0] wea
+  .wea(writeEnM),      // input wire [3 : 0] wea
   .addra(dataadr),  // input wire [31 : 0] addra
   .dina(writedata),    // input wire [31 : 0] dina
   .douta(readdata)  // output wire [31 : 0] douta

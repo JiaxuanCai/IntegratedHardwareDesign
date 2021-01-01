@@ -73,7 +73,7 @@ module alu#(parameter MUT_MAX=5)(
 			`EXE_SLTU_OP,`EXE_SLTIU_OP:y <=a<b;
 			//分支跳转指令
 			//访存指令
-			`EXE_SW_OP,`EXE_LW_OP:y<=s;
+			`EXE_LW_OP,`EXE_SW_OP,`EXE_LB_OP,`EXE_LBU_OP,`EXE_LH_OP,`EXE_LHU_OP,`EXE_SB_OP,`EXE_SH_OP: y<=s;
 			//内陷指令
 			//特权指令
 

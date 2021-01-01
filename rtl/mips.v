@@ -8,7 +8,7 @@ module mips(
 	output wire memwriteM,
 	output wire[31:0] aluoutM,writedataM,
 	input wire[31:0] readdataM,
-
+	output wire [3:0]readEnM,writeEnM,
 	output wire [4:0] rsE,rtE,rdE,
 	output wire [4:0] rsD,rtD,rdD,
 
@@ -26,7 +26,7 @@ module mips(
 	wire HLwriteM,HLwriteW;
 	//错误：这里没有加，导致z
 	wire [7:0] alucontrolD;
-	wire [7:0] alucontrolE;
+	wire [7:0] alucontrolE,alucontrolM;
 	wire flushE,equalD;
 	wire stallD,stallE,stallM,stallW,flushM,flushW;
 	wire writeTo31E,BJalM;
@@ -48,7 +48,7 @@ module mips(
 
 		//内存访问级信号
 		memtoregM,memwriteM,
-		regwriteM,HLwriteM,BJalM,
+		regwriteM,HLwriteM,BJalM,alucontrolM,
 		stallM,flushM,
 		//写回级信号
 		memtoregW,regwriteW,
@@ -77,8 +77,8 @@ module mips(
 		memtoregM,
 		regwriteM,
 		HLwriteM,BJalM,
-		aluoutM,writedataM,
-		readdataM,
+		aluoutM,writedataM,alucontrolM,
+		readdataM,readEnM,writeEnM,
 		flushM,
 		//写回级信号
 		memtoregW,
