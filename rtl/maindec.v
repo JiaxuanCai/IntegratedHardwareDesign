@@ -8,7 +8,7 @@ module maindec(
 	output wire branch,alusrc,
 	output wire regdst,regwrite,
 	output wire jump,
-	output reg jal,jr,bal,
+	output reg jal,jr,bal,writeTo31,
 	output reg HLwrite
 	//output wire[1:0] aluop
     );
@@ -17,7 +17,7 @@ module maindec(
 
 	//op觉得控制信号
 	always @(*) begin
-		jal<=0;jr<=0;bal<=0;
+		jal<=0;jr<=0;bal<=0;writeTo31<=0;
 		if(op==`EXE_NOP)begin
 			case(funct)
 			//TODO
@@ -31,8 +31,9 @@ module maindec(
 				controls <= 7'b0000001;
 				jr<=1;
 			end
+			//选择正常的路径
 			`EXE_JALR:begin
-				controls <= 7'b1000001;
+				controls <= 7'b1100001;
 				jr<=1;
 				jal<=1;
 			end
@@ -57,13 +58,16 @@ module maindec(
 			`EXE_JAL:begin
 				controls <= 7'b1000001;
 				jal<=1;
+				writeTo31<=1;
 			end
 			`EXE_REGIMM_INST:begin
 				case(rt)
 				`EXE_BLTZ,`EXE_BGEZ:controls <= 7'b0001000;
 				`EXE_BLTZAL,`EXE_BGEZAL:begin
-					controls <= 7'b0001000;
+					//错误：未把regwrite置位1
+					controls <= 7'b1001000;
 					bal<=1;
+					writeTo31<=1;
 				end
 				endcase
 			end

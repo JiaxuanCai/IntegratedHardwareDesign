@@ -5,6 +5,7 @@ module controller(
 	input wire clk,rst,
 	
 	//decode stage
+	output wire [7:0]alucontrolD,
 	input wire[5:0] opD,functD,
 	input wire[4:0] InstrRtD,
 	output wire pcsrcD,branchD,jumpD,jrD,
@@ -14,7 +15,7 @@ module controller(
 	//execute stage
 	input wire flushE,stallE,
 	output wire memtoregE,alusrcE,
-	output wire regdstE,regwriteE,	
+	output wire regdstE,regwriteE,	writeTo31E,
 	output wire[7:0] alucontrolE,
 
 	//mem stage
@@ -30,12 +31,12 @@ module controller(
 	//decode stage
 	wire[1:0] aluopD;
 	wire memtoregD,memwriteD,alusrcD,regdstD,regwriteD;
+	wire writeTo31D,writeTo31E;
 	wire HLwriteD,HLwriteE;
 	//////////////////////////////////////
 	wire memenD;
 	wire jalD,jrD,balD;//以后修改通路可能用
 	//////////////////////////////////////
-	wire[7:0] alucontrolD;
 	wire BJalD;
 	assign BJalD=jalD|balD;
 	//execute stage
@@ -48,12 +49,12 @@ module controller(
 		memtoregD,memenD,memwriteD,
 		branchD,alusrcD,
 		regdstD,regwriteD,
-		jumpD,jalD,jrD,balD,
+		jumpD,jalD,jrD,balD,writeTo31D,
 		HLwriteD
 		//aluopD
 	);
 
-	aludec ad(opD,functD,alucontrolD);
+	aludec ad(opD,functD,InstrRtD,alucontrolD);
 
 	assign pcsrcD = branchD & equalD;
 
@@ -63,8 +64,8 @@ module controller(
 		rst,
 		~stallE,
 		flushE,
-		{memtoregD,memwriteD,alusrcD,regdstD,regwriteD,alucontrolD,HLwriteD,BJalD},
-		{memtoregE,memwriteE,alusrcE,regdstE,regwriteE,alucontrolE,HLwriteE,BJalE}
+		{memtoregD,memwriteD,alusrcD,regdstD,regwriteD,alucontrolD,HLwriteD,BJalD,writeTo31D},
+		{memtoregE,memwriteE,alusrcE,regdstE,regwriteE,alucontrolE,HLwriteE,BJalE,writeTo31E}
 	);
 
 	flopenrc #(8) regM(

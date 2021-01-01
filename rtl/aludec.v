@@ -3,6 +3,7 @@
 module aludec(
 	input wire [5:0]op,
 	input wire[5:0] funct,
+	input wire[4:0] rt,
 	output reg[7:0] alucontrol
     );
 	always @(*) begin

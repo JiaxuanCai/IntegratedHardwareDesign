@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="testbench_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="glbl" />
+            <top_module name="testbench" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="175390fs"></ZoomStartTime>
+      <ZoomEndTime time="438791fs"></ZoomEndTime>
+      <Cursor1Time time="396210fs"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="194"></NameColumnWidth>
+      <ValueColumnWidth column_width="78"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="49" />
+   <wvobject fp_name="/testbench/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/rst" type="logic">
+      <obj_property name="ElementShortName">rst</obj_property>
+      <obj_property name="ObjectShortName">rst</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/writedata" type="array">
+      <obj_property name="ElementShortName">writedata[31:0]</obj_property>
+      <obj_property name="ObjectShortName">writedata[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dataadr" type="array">
+      <obj_property name="ElementShortName">dataadr[31:0]</obj_property>
+      <obj_property name="ObjectShortName">dataadr[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/instr" type="array">
+      <obj_property name="ElementShortName">instr[31:0]</obj_property>
+      <obj_property name="ObjectShortName">instr[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/pc" type="array">
+      <obj_property name="ElementShortName">pc[31:0]</obj_property>
+      <obj_property name="ObjectShortName">pc[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/pcnextFD" type="array">
+      <obj_property name="ElementShortName">pcnextFD[31:0]</obj_property>
+      <obj_property name="ObjectShortName">pcnextFD[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/pcplus4D" type="array">
+      <obj_property name="ElementShortName">pcplus4D[31:0]</obj_property>
+      <obj_property name="ObjectShortName">pcplus4D[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/signimmshD" type="array">
+      <obj_property name="ElementShortName">signimmshD[31:0]</obj_property>
+      <obj_property name="ObjectShortName">signimmshD[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/pcbranchD" type="array">
+      <obj_property name="ElementShortName">pcbranchD[31:0]</obj_property>
+      <obj_property name="ObjectShortName">pcbranchD[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/readdata" type="array">
+      <obj_property name="ElementShortName">readdata[31:0]</obj_property>
+      <obj_property name="ObjectShortName">readdata[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/memwrite" type="logic">
+      <obj_property name="ElementShortName">memwrite</obj_property>
+      <obj_property name="ObjectShortName">memwrite</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/lwstallD" type="logic">
+      <obj_property name="ElementShortName">lwstallD</obj_property>
+      <obj_property name="ObjectShortName">lwstallD</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/branchstallD" type="logic">
+      <obj_property name="ElementShortName">branchstallD</obj_property>
+      <obj_property name="ObjectShortName">branchstallD</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/rsE" type="array">
+      <obj_property name="ElementShortName">rsE[4:0]</obj_property>
+      <obj_property name="ObjectShortName">rsE[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/rtE" type="array">
+      <obj_property name="ElementShortName">rtE[4:0]</obj_property>
+      <obj_property name="ObjectShortName">rtE[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/rdE" type="array">
+      <obj_property name="ElementShortName">rdE[4:0]</obj_property>
+      <obj_property name="ObjectShortName">rdE[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/rsD" type="array">
+      <obj_property name="ElementShortName">rsD[4:0]</obj_property>
+      <obj_property name="ObjectShortName">rsD[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/rtD" type="array">
+      <obj_property name="ElementShortName">rtD[4:0]</obj_property>
+      <obj_property name="ObjectShortName">rtD[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/rdD" type="array">
+      <obj_property name="ElementShortName">rdD[4:0]</obj_property>
+      <obj_property name="ObjectShortName">rdD[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/stallF" type="logic">
+      <obj_property name="ElementShortName">stallF</obj_property>
+      <obj_property name="ObjectShortName">stallF</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/flushE" type="logic">
+      <obj_property name="ElementShortName">flushE</obj_property>
+      <obj_property name="ObjectShortName">flushE</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/stallD" type="logic">
+      <obj_property name="ElementShortName">stallD</obj_property>
+      <obj_property name="ObjectShortName">stallD</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/srca2D" type="array">
+      <obj_property name="ElementShortName">srca2D[31:0]</obj_property>
+      <obj_property name="ObjectShortName">srca2D[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/rf/rf[1]" type="array">
+      <obj_property name="ElementShortName">[1][31:0]</obj_property>
+      <obj_property name="ObjectShortName">[1][31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/rf/rf[2]" type="array">
+      <obj_property name="ElementShortName">[2][31:0]</obj_property>
+      <obj_property name="ObjectShortName">[2][31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/rf/rf[3]" type="array">
+      <obj_property name="ElementShortName">[3][31:0]</obj_property>
+      <obj_property name="ObjectShortName">[3][31:0]</obj_property>
+      <obj_property name="Radix">BINARYRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/jrD" type="logic">
+      <obj_property name="ElementShortName">jrD</obj_property>
+      <obj_property name="ObjectShortName">jrD</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/brRest" type="logic">
+      <obj_property name="ElementShortName">brRest</obj_property>
+      <obj_property name="ObjectShortName">brRest</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/branchD" type="logic">
+      <obj_property name="ElementShortName">branchD</obj_property>
+      <obj_property name="ObjectShortName">branchD</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/jumpD" type="logic">
+      <obj_property name="ElementShortName">jumpD</obj_property>
+      <obj_property name="ObjectShortName">jumpD</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/stallF" type="logic">
+      <obj_property name="ElementShortName">stallF</obj_property>
+      <obj_property name="ObjectShortName">stallF</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/stallD" type="logic">
+      <obj_property name="ElementShortName">stallD</obj_property>
+      <obj_property name="ObjectShortName">stallD</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/stallE" type="logic">
+      <obj_property name="ElementShortName">stallE</obj_property>
+      <obj_property name="ObjectShortName">stallE</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/stallM" type="logic">
+      <obj_property name="ElementShortName">stallM</obj_property>
+      <obj_property name="ObjectShortName">stallM</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/stallW" type="logic">
+      <obj_property name="ElementShortName">stallW</obj_property>
+      <obj_property name="ObjectShortName">stallW</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/flushD" type="logic">
+      <obj_property name="ElementShortName">flushD</obj_property>
+      <obj_property name="ObjectShortName">flushD</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/flushE" type="logic">
+      <obj_property name="ElementShortName">flushE</obj_property>
+      <obj_property name="ObjectShortName">flushE</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/flushM" type="logic">
+      <obj_property name="ElementShortName">flushM</obj_property>
+      <obj_property name="ObjectShortName">flushM</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/flushW" type="logic">
+      <obj_property name="ElementShortName">flushW</obj_property>
+      <obj_property name="ObjectShortName">flushW</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/brdecode/op" type="array">
+      <obj_property name="ElementShortName">op[7:0]</obj_property>
+      <obj_property name="ObjectShortName">op[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/brdecode/rs" type="array">
+      <obj_property name="ElementShortName">rs[31:0]</obj_property>
+      <obj_property name="ObjectShortName">rs[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/brdecode/rt" type="array">
+      <obj_property name="ElementShortName">rt[31:0]</obj_property>
+      <obj_property name="ObjectShortName">rt[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/brdecode/y" type="logic">
+      <obj_property name="ElementShortName">y</obj_property>
+      <obj_property name="ObjectShortName">y</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/rf/rf[31]" type="array">
+      <obj_property name="ElementShortName">[31][31:0]</obj_property>
+      <obj_property name="ObjectShortName">[31][31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/writeregE" type="array">
+      <obj_property name="ElementShortName">writeregE[4:0]</obj_property>
+      <obj_property name="ObjectShortName">writeregE[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/writeregM" type="array">
+      <obj_property name="ElementShortName">writeregM[4:0]</obj_property>
+      <obj_property name="ObjectShortName">writeregM[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/writeregW" type="array">
+      <obj_property name="ElementShortName">writeregW[4:0]</obj_property>
+      <obj_property name="ObjectShortName">writeregW[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/dut/mips/dp/resultW" type="array">
+      <obj_property name="ElementShortName">resultW[31:0]</obj_property>
+      <obj_property name="ObjectShortName">resultW[31:0]</obj_property>
+   </wvobject>
+</wave_config>

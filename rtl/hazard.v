@@ -11,6 +11,7 @@ module hazard(
 	input wire jumpD,
 	output wire forwardaD,forwardbD,//指令译码阶段数据前推rs、rd
 	output wire stallD,//译码级暂停控制信号，低电位有效
+	output wire flushD,
 
 	//运算级信号
 	input wire[4:0] rsE,rtE,//运算阶段数据前推rs寄存器,运算阶段数据前推rt寄存器
@@ -69,6 +70,10 @@ module hazard(
 	
 		/////////////////////////////////////////////////////////////////////////////////////////结束
 	end
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////NOTICE
+	//下面的可能存在逻辑上的错误
+
 	//如果在M阶段写，直接前推即可
 	assign forwardHLE=HLwriteM;
 	//取指令的暂停控制信号  （属于数据冒险模块）
@@ -92,9 +97,13 @@ module hazard(
 	//W级暂停
 	assign #1 stallW=0;
 
+	//D级刷新
+	assign flushD=0;
 
 	//E级刷新
-	assign #1 flushE = lwstallD | branchstallD|jumpD;
+	//assign #1 flushE = lwstallD | branchstallD|jumpD;
+	//错误：不能根据branch或者jump刷新e级
+	assign #1 flushE = lwstallD| branchstallD;
 
 	//M级刷新
 	assign #1 flushM=0;

@@ -9,8 +9,11 @@ module datapath(
 	input wire[31:0] instrF,// 取指令级的指令
 
 	//指令译码阶段信号
+	//错误：没有引入alucontrolD
+	input wire[7:0] alucontrolD,//计算单元计算类型选择
 	input wire pcsrcD,branchD, //译码阶段地址来源 与 条件跳转指令，相等则分支
 	input wire jumpD,jrD,//无条件跳转指令地址
+
 	
 	output wire brRest,//两个寄存器源操作数相等则有效
 	output wire[5:0] opD,functD,// 指令的操作码字段 
@@ -18,7 +21,7 @@ module datapath(
 	//运算级信号
 	input wire memtoregE,//指令执行级的存储器写寄存器控制信号
 	input wire alusrcE,regdstE,//执行指令级寄存器来源//指令执行级目标寄存器
-	input wire regwriteE,//计算级控制是否写入寄存器
+	input wire regwriteE,writeTo31E,//计算级控制是否写入寄存器
 	input wire[7:0] alucontrolE,//计算单元计算类型选择
 	output wire flushE,//指令运算级刷新信号
 	//错误：控制器流水线没有stall
@@ -105,7 +108,7 @@ module datapath(
 		.jumpD(jumpD),
 		.forwardaD(forwardaD),
 		.forwardbD(forwardbD),
-		.stallD(stallD),
+		.stallD(stallD),.flushD(flushD),
 
 		//运算级信号
 		.rsE(rsE),
@@ -153,8 +156,9 @@ module datapath(
 	pc #(32) pcreg(clk,rst,~stallF,pcnextFD,pcF);  //地址计算部分
 	adder pcadd1(pcF,32'b100,pcplus4F);  //地址计算部分
 
-	assign flushD=pcsrcD|jumpD;
+	
 	//译指触发器
+	//错误：地址计算部分不能刷新
 	flopenrc #(32) r1D(clk,rst,~stallD,flushD,pcplus4F,pcplus4D);  //地址计算部分
 	flopenrc #(32) r2D(clk,rst,~stallD,flushD,instrF,instrD);
 
@@ -189,11 +193,15 @@ module datapath(
 	mux3 #(32) forwardaemux(srcaE,resultW,aluoutM,forwardaE,srca2E);
 	mux3 #(32) forwardbemux(srcbE,resultW,aluoutM,forwardbE,srcb2E);
 	mux2 #(64) forwardHLmux(HLregW,HLOutM,forwardHLE,aluHLsrc);
+	
 	mux2 #(32) srcbmux(srcb2E,signimmE,alusrcE,srcb3E);
 	//alu alu(srca2E,srcb3E,alucontrolE,saE,aluoutE);
 	//错误日志：未加入overflow、zero导致对齐错误
 	alu alu(clk,rst,clr_mut_divE,srca2E,srcb3E,alucontrolE,saE,aluoutE,aluHLsrc[63:32],aluHLsrc[31:0],HLOutE[63:32],HLOutE[31:0],mut_div_stallE);
-	mux2 #(5) wrmux(rtE,rdE,regdstE,writeregE);
+	//错误：必须加载E阶段
+	wire [4:0]writeregEsrc1;
+	mux2 #(5) wrmux(rtE,rdE,regdstE,writeregEsrc1);
+	mux2 #(5) wr2mux(writeregEsrc1,31,writeTo31E,writeregE);
 	assign clr_mut_divE=0;
 	//错误日志：写成了floprc
 	//内存访问级信号触发器

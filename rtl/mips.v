@@ -24,13 +24,17 @@ module mips(
 	wire regdstE,alusrcE,pcsrcD,memtoregE,memtoregM,memtoregW;
 	wire regwriteE,regwriteM,regwriteW;
 	wire HLwriteM,HLwriteW;
+	//错误：这里没有加，导致z
+	wire [7:0] alucontrolD;
 	wire [7:0] alucontrolE;
 	wire flushE,equalD;
 	wire stallD,stallE,stallM,stallW,flushM,flushW;
+	wire writeTo31E;
 
 	controller c(
 		clk,rst,
 		//取指令阶段信号
+		alucontrolD,
 		opD,functD,InstrRtD,
 		pcsrcD,branchD,jumpD,jrD,
 		
@@ -39,7 +43,7 @@ module mips(
 		//运算级信号
 		flushE,stallE,
 		memtoregE,alusrcE,
-		regdstE,regwriteE,	
+		regdstE,regwriteE,	writeTo31E,
 		alucontrolE,
 
 		//内存访问级信号
@@ -57,6 +61,7 @@ module mips(
 		pcF,
 		instrF,
 		//指令译码阶段信号
+		alucontrolD,
 		pcsrcD,branchD,
 		jumpD,jrD,
 		equalD,
@@ -65,7 +70,7 @@ module mips(
 		//运算级信号
 		memtoregE,
 		alusrcE,regdstE,
-		regwriteE,
+		regwriteE,writeTo31E,
 		alucontrolE,
 		flushE,
 		//内存访问级信号

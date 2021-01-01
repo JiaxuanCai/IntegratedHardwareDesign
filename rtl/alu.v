@@ -90,7 +90,6 @@ module alu#(parameter MUT_MAX=5)(
 		start_div<=1'b0;
 		stall_div<=1'b0;
 		case(op)
-		//错误：没有置零start
 		`EXE_MULT_OP,`EXE_MULTU_OP:begin
 			if(~mut_ready)begin
 				start_mut<=1'b1;
