@@ -212,6 +212,7 @@ module datapath(
 	flopenrc #(5) r3M(clk,rst,~stallM,flushM,writeregE,writeregM);
 	flopenrc #(64) r4M(clk,rst,~stallM,flushM,HLOutE,HLOutM);
 	flopenrc#(32) r5M(clk,rst,~stallM,flushM,pcplus4E,pcplus4M);
+	//错误：数据前推的需要，必须在M决定aluout
 	wire [31:0]pcplus8M;
 	assign pcplus8M=pcplus4M+4;
 	mux2 #(32) resmux2(aluoutMsrc,pcplus8M,BJalM,aluoutM);
