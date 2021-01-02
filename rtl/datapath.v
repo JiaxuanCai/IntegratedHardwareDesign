@@ -24,15 +24,15 @@ module datapath(
 	input wire regwriteE,writeTo31E,//计算级控制是否写入寄存器
 	input wire[7:0] alucontrolE,//计算单元计算类型选择
 	output wire flushE,//指令运算级刷新信号
-	//错误：控制器流水线没有stall
-	
+
 
 	//内存访问级信号
 	input wire memtoregM,//内存操作级的存储器写寄存器控制信号
 	input wire regwriteM,//访问内存级控制是否写入寄存器
 	input wire HLwriteM,BJalM,
 	output wire[31:0] aluoutM,writedata_decodedM,//运算级的运算结果//待写回内存的值
-	input wire[7:0]alucontrolM,
+	output wire[7:0] expectTypeM,
+ 	input wire[7:0]alucontrolM,
 	input wire[31:0] readdataM,//内存级读出的数据
 	output wire [3:0]readEnM,writeEnM,
 	output wire flushM,
@@ -42,6 +42,11 @@ module datapath(
 	input wire regwriteW, //写回级读出的数据
 	input wire HLwriteW,
 	output wire flushW,
+	output wire [31:0]pcW,
+	output wire [3:0]writeEnW,
+	output wire [4:0]writeregW,
+	output wire [31:0]resultW,
+	
 	
 
 	output wire [4:0] rsE,rtE,rdE,
@@ -67,6 +72,7 @@ module datapath(
 	wire flushD;//stallD; 
 	wire [31:0] signimmD,signimmshD;
 	wire [31:0] srcaD,srca2D,srcbD,srcb2D;
+	wire[31:0]pcD;
 
 	//运算级信号
 	wire [1:0] forwardaE,forwardbE;
@@ -75,6 +81,7 @@ module datapath(
 	wire mut_div_stallE;
 	wire stallE;
 	wire clr_mut_divE;
+	wire[31:0]pcE;
 	
 	wire [4:0] saE;
 	wire [4:0] writeregE;
@@ -87,8 +94,11 @@ module datapath(
 	wire [4:0] writeregM;
 	wire [63:0] HLOutM;
 	wire [31:0] pcplus4M;
+	wire[31:0]pcM;
 	wire stallM,flushM;
-	
+	//TODO
+	//异常的部分实现后修改，暂时引出
+	assign expectTypeM=0;
 
 	//写回级信号
 	wire [4:0] writeregW;
@@ -96,6 +106,7 @@ module datapath(
 	wire [63:0] HLOutW;
 	wire [63:0] HLregW;
 	wire [31:0] pcplus4W;
+	wire[31:0]pcW;
 	wire stallW,flushW;
 
 	//冒险模块
@@ -164,6 +175,7 @@ module datapath(
 	//错误：地址计算部分不能刷新
 	flopenrc #(32) r1D(clk,rst,~stallD,flushD,pcplus4F,pcplus4D);  //地址计算部分
 	flopenrc #(32) r2D(clk,rst,~stallD,flushD,instrF,instrD);
+	flopenrc #(32) r3D(clk,rst,~stallD,flushD,pcF,pcD);
 
 	signext se(instrD[15:0],instrD[29:28],signimmD); //32位符号扩展立即数
 	sl2 immsh(signimmD,signimmshD); //地址计算部分
@@ -192,6 +204,7 @@ module datapath(
 	flopenrc#(5) r6E(clk,rst,~stallE,flushE,rdD,rdE);
 	flopenrc#(5) r7E(clk,rst,~stallE,flushE,saD,saE);
 	flopenrc#(32) r8E(clk,rst,~stallE,flushE,pcplus4D,pcplus4E);
+	flopenrc #(32) r9E(clk,rst,~stallD,flushD,pcD,pcE);
 
 	mux3 #(32) forwardaemux(srcaE,resultW,aluoutM,forwardaE,srca2E);
 	mux3 #(32) forwardbemux(srcbE,resultW,aluoutM,forwardbE,srcb2E);
@@ -215,6 +228,7 @@ module datapath(
 	flopenrc #(5) r3M(clk,rst,~stallM,flushM,writeregE,writeregM);
 	flopenrc #(64) r4M(clk,rst,~stallM,flushM,HLOutE,HLOutM);
 	flopenrc#(32) r5M(clk,rst,~stallM,flushM,pcplus4E,pcplus4M);
+	flopenrc #(32) r6M(clk,rst,~stallD,flushD,pcE,pcM);
 	//错误：数据前推的需要，必须在M决定aluout
 	wire [31:0]pcplus8M;
 	assign pcplus8M=pcplus4M+4;
@@ -230,6 +244,7 @@ module datapath(
 	flopenrc #(32) r2W(clk,rst,~stallW,flushW,readdata_decodedM,readdataW);
 	flopenrc #(5) r3W(clk,rst,~stallW,flushW,writeregM,writeregW);
 	flopenrc #(64) r4W(clk,rst,~stallW,flushW,HLOutM,HLOutW);
+	flopenrc #(32) r5W(clk,rst,~stallD,flushD,pcM,pcW);
 	//HL寄存器
 	hilo_reg hilorrg(clk,rst,HLwriteW,HLOutW[63:32],HLOutW[31:0],HLregW[63:32],HLregW[31:0]);
 

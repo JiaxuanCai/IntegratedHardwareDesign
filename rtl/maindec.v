@@ -14,6 +14,8 @@ module maindec(
     );
 	reg[7:0] controls;
 	assign {regwrite,regdst,alusrc,branch,memwrite,memtoreg,jump} = controls;
+	assign memen = (op == `EXE_LB)||(op == `EXE_LBU)||(op == `EXE_LH)||
+                (op == `EXE_LHU)||(op == `EXE_LW)||(op == `EXE_SB)||(op == `EXE_SH)||(op == `EXE_SW);
 
 	//op觉得控制信号
 	always @(*) begin

@@ -65,15 +65,15 @@ module controller(
 		rst,
 		~stallE,
 		flushE,
-		{memtoregD,memwriteD,alusrcD,regdstD,regwriteD,alucontrolD,HLwriteD,BJalD,writeTo31D},
-		{memtoregE,memwriteE,alusrcE,regdstE,regwriteE,alucontrolE,HLwriteE,BJalE,writeTo31E}
+		{memtoregD,memwriteD,alusrcD,regdstD,regwriteD,alucontrolD,HLwriteD,BJalD,writeTo31D,memenD},
+		{memtoregE,memwriteE,alusrcE,regdstE,regwriteE,alucontrolE,HLwriteE,BJalE,writeTo31E,memenE}
 	);
 	//错误：流水线中变量写错，alucontrolM恒伟1
 	flopenrc #(16) regM(
 		clk,rst,~stallM,
 		flushM,
-		{memtoregE,memwriteE,regwriteE,HLwriteE,BJalE,alucontrolE},
-		{memtoregM,memwriteM,regwriteM,HLwriteM,BJalM,alucontrolM}
+		{memtoregE,memwriteE,regwriteE,HLwriteE,BJalE,alucontrolE,memenE},
+		{memtoregM,memwriteM,regwriteM,HLwriteM,BJalM,alucontrolM,memenM}
 	);
 
 	flopenrc #(8) regW(

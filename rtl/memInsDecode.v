@@ -75,7 +75,7 @@ module memInsDecode(
                 else if(endOfAddr==2'b10)readdataOut<={{24{readdata[23]}},readdata[23:16]};
                 else if(endOfAddr==2'b11)readdataOut<={{24{readdata[31]}},readdata[31:24]};
             end
-            //错误：没有加U
+            //错误：没有加U 
             `EXE_LBU_OP:begin
                 if(endOfAddr==2'b00)readdataOut<={24'b0,readdata[7:0]};
                 else if(endOfAddr==2'b01)readdataOut<={24'b0,readdata[15:8]};

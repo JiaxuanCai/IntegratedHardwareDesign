@@ -11,6 +11,10 @@ module mips(
 	output wire [3:0]readEnM,writeEnM,
 	output wire [4:0] rsE,rtE,rdE,
 	output wire [4:0] rsD,rtD,rdD,
+	output wire [31:0]debug_wb_pc,
+	output wire [3:0]debug_wb_rf_wen,
+	output wire [4:0]debug_wb_rf_wnum,
+	output wire [31:0]debug_wb_rf_wdata,
 
 	output lwstallD,branchstallD,
 
@@ -30,7 +34,8 @@ module mips(
 	wire flushE,equalD;
 	wire stallD,stallE,stallM,stallW,flushM,flushW;
 	wire writeTo31E,BJalM;
-
+	wire [7:0]expectTypeM;
+	wire memenM;
 	controller c(
 		clk,rst,
 		//取指令阶段信号
@@ -48,7 +53,7 @@ module mips(
 
 		//内存访问级信号
 		memtoregM,memwriteM,
-		regwriteM,HLwriteM,BJalM,alucontrolM,
+		regwriteM,HLwriteM,BJalM,memenM,alucontrolM,
 		stallM,flushM,
 		//写回级信号
 		memtoregW,regwriteW,
@@ -78,13 +83,21 @@ module mips(
 		regwriteM,
 		HLwriteM,BJalM,
 		aluoutM,writedataM,alucontrolM,
-		readdataM,readEnM,writeEnM,
+		readdataM,readEnM,writeEnM,expectTypeM,
 		flushM,
 		//写回级信号
 		memtoregW,
 		regwriteW,
 		HLwriteW,
 		flushW,
+		debug_wb_pc,
+		debug_wb_rf_wen,
+		debug_wb_rf_wnum,
+		debug_wb_rf_wdata,
+
+
+
+
 		rsE,rtE,rdE,
 	    rsD,rtD,rdD,
 		lwstallD,branchstallD,
