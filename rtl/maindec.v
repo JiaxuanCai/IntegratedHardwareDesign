@@ -1,5 +1,6 @@
 `timescale 1ns / 1ps
 `include "defines.vh"
+//分支部分参考ppt
 module maindec(
 	input wire[5:0] op,
 	input wire[5:0] funct,
@@ -35,9 +36,8 @@ module maindec(
 			end
 			//选择正常的路径
 			`EXE_JALR:begin
-				controls <= 7'b1100001;
+				controls <= 7'b1100000;
 				jr<=1;
-				jal<=1;
 			end
 			//访存指令
 			//内陷指令
@@ -58,7 +58,7 @@ module maindec(
 			`EXE_J:controls <= 7'b0000001;
 			//使用了与ppt不一样的逻辑
 			`EXE_JAL:begin
-				controls <= 7'b1000001;
+				controls <= 7'b1000000;
 				jal<=1;
 				writeTo31<=1;
 			end

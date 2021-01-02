@@ -25,6 +25,7 @@ module mips(
 	wire [5:0] opD,functD;
 	wire [4:0] InstrRtD;
 	wire jrD;
+	wire jalD,balD;
 	wire regdstE,alusrcE,pcsrcD,memtoregE,memtoregM,memtoregW;
 	wire regwriteE,regwriteM,regwriteW;
 	wire HLwriteM,HLwriteW;
@@ -41,7 +42,7 @@ module mips(
 		//取指令阶段信号
 		alucontrolD,
 		opD,functD,InstrRtD,
-		pcsrcD,branchD,jumpD,jrD,
+		pcsrcD,branchD,jumpD,jrD,jalD,balD,
 		
         equalD,
 
@@ -68,7 +69,7 @@ module mips(
 		//指令译码阶段信号
 		alucontrolD,
 		pcsrcD,branchD,
-		jumpD,jrD,
+		jumpD,jrD,jalD,balD,
 		equalD,
 		opD,functD,
 		InstrRtD,
@@ -82,8 +83,8 @@ module mips(
 		memtoregM,
 		regwriteM,
 		HLwriteM,BJalM,
-		aluoutM,writedataM,alucontrolM,
-		readdataM,readEnM,writeEnM,expectTypeM,
+		aluoutM,writedataM,expectTypeM,alucontrolM,
+		readdataM,readEnM,writeEnM,
 		flushM,
 		//写回级信号
 		memtoregW,

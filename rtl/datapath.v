@@ -12,7 +12,7 @@ module datapath(
 	//错误：没有引入alucontrolD
 	input wire[7:0] alucontrolD,//计算单元计算类型选择
 	input wire pcsrcD,branchD, //译码阶段地址来源 与 条件跳转指令，相等则分支
-	input wire jumpD,jrD,//无条件跳转指令地址
+	input wire jumpD,jrD,jalD,balD,//无条件跳转指令地址
 
 	
 	output wire brRest,//两个寄存器源操作数相等则有效
@@ -43,7 +43,7 @@ module datapath(
 	input wire HLwriteW,
 	output wire flushW,
 	output wire [31:0]pcW,
-	output wire [3:0]writeEnW,
+	output wire [3:0]regenW,
 	output wire [4:0]writeregW,
 	output wire [31:0]resultW,
 	
@@ -57,7 +57,7 @@ module datapath(
 	output stallF,stallD,stallE,stallM,stallW
 
 );
-	
+	assign regenW={4{regwriteW}};
 	//取指令阶段信号
 	//wire stallF;
 
@@ -79,7 +79,6 @@ module datapath(
 	wire [31:0] pcplus4E;
 	wire forwardHLE;
 	wire mut_div_stallE;
-	wire stallE;
 	wire clr_mut_divE;
 	wire[31:0]pcE;
 	
@@ -95,19 +94,18 @@ module datapath(
 	wire [63:0] HLOutM;
 	wire [31:0] pcplus4M;
 	wire[31:0]pcM;
-	wire stallM,flushM;
+	wire flushM;
 	//TODO
 	//异常的部分实现后修改，暂时引出
 	assign expectTypeM=0;
 
 	//写回级信号
-	wire [4:0] writeregW;
-	wire [31:0] aluoutW,readdataW,resultW;
+	wire [31:0] aluoutW,readdataW;
 	wire [63:0] HLOutW;
 	wire [63:0] HLregW;
 	wire [31:0] pcplus4W;
-	wire[31:0]pcW;
-	wire stallW,flushW;
+	
+	wire flushW;
 
 	//冒险模块
 	hazard h(
@@ -119,7 +117,7 @@ module datapath(
 		.rsD(rsD),
 		.rtD(rtD),
 		.branchD(branchD), 
-		.jumpD(jumpD),
+		.jumpD(jumpD),.jrD(jrD),
 		.forwardaD(forwardaD),
 		.forwardbD(forwardbD),
 		.stallD(stallD),.flushD(flushD),
@@ -160,7 +158,7 @@ module datapath(
 	//jr为1直接跳寄存器值，否则如果jump为1跳拼接值，否则正常+4
 	//错误：必须选择数据前推后的srca2D
 	assign pcnextFD=jrD?srca2D:
-						jumpD?{pcplus4D[31:28],instrD[25:0],2'b00}:pcnextbrFD;
+						(jumpD|jalD)?{pcplus4D[31:28],instrD[25:0],2'b00}:pcnextbrFD;
 	
 	//寄存器访问
 	regfile rf(clk,regwriteW,rsD,rtD,writeregW,resultW,srcaD,srcbD);
@@ -239,12 +237,15 @@ module datapath(
     wire read_addr_errorM,wirte_addr_errorM;
 	memInsDecode memdec(alucontrolM,aluoutM[1:0],readdataM,writedataM,readdata_decodedM,writedata_decodedM,readEnM,writeEnM,read_addr_errorM,wirte_addr_errorM);
 
+	wire [3:0]writeEnW;
+
 	//写回级信号触发器
 	flopenrc #(32) r1W(clk,rst,~stallW,flushW,aluoutM,aluoutW);
 	flopenrc #(32) r2W(clk,rst,~stallW,flushW,readdata_decodedM,readdataW);
 	flopenrc #(5) r3W(clk,rst,~stallW,flushW,writeregM,writeregW);
 	flopenrc #(64) r4W(clk,rst,~stallW,flushW,HLOutM,HLOutW);
 	flopenrc #(32) r5W(clk,rst,~stallW,flushW,pcM,pcW);
+	flopenrc #(32) r6W(clk,rst,~stallW,flushW,writeEnM,writeEnW);
 	//HL寄存器
 	hilo_reg hilorrg(clk,rst,HLwriteW,HLOutW[63:32],HLOutW[31:0],HLregW[63:32],HLregW[31:0]);
 

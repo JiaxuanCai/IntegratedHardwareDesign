@@ -21,6 +21,7 @@
 
 //封装成Sram接口
 //参考https://www.bilibili.com/video/BV1XJ411k7kR?p=3
+
 module mycpu_top(
     input wire clk,resetn,
     input wire[15:0] int,  //interrupt,high active
@@ -49,17 +50,25 @@ module mycpu_top(
     wire [31:0]pcF;
 	wire [5:0] opD,functD;
 	wire [4:0] InstrRtD;
+    wire branchD,jumpF,memwriteM;
+    wire [31:0] aluoutM,writedataM;
+    wire [3:0] readEnM,writeEnM;
+    wire [4:0] rsE,rtE,rdE,rsD,rtD,rdD;
+    wire lwstallD,branchstallD,stallF;
 	wire jrD;
+    wire jalD,balD;
 	wire regdstE,alusrcE,pcsrcD,memtoregE,memtoregM,memtoregW;
 	wire regwriteE,regwriteM,regwriteW;
 	wire HLwriteM,HLwriteW;
-	//错误：这里没有加，导致z
+	//错误：这里没有加，导致z,一定要看warning
 	wire [7:0] alucontrolD;
 	wire [7:0] alucontrolE,alucontrolM;
 	wire flushE,equalD;
 	wire stallD,stallE,stallM,stallW,flushM,flushW;
 	wire writeTo31E,BJalM;
     wire [7:0]expectTypeM;
+    //严重错误：忘记写导致readdataM只有1位
+    wire [31:0] readdataM;
     wire memenM;
 
     assign inst_sram_en=1'b1;
@@ -70,16 +79,17 @@ module mycpu_top(
 
     assign data_sram_en=memenM&~(|expectTypeM);
     assign data_sram_wen=writeEnM;
-    assign data_sram_addr=aluoutM;
+    //错误：地址转换，de了五个小时
+    assign data_sram_addr=aluoutM[31]?{3'b0,aluoutM[28:0]}:aluoutM;
     assign data_sram_wdata=writedataM;
     assign readdataM=data_sram_rdata;
 
 	controller c(
-		clk,rst,
+		~clk,rst,
 		//取指令阶段信号
 		alucontrolD,
 		opD,functD,InstrRtD,
-		pcsrcD,branchD,jumpD,jrD,
+		pcsrcD,branchD,jumpD,jrD,jalD,balD,
 		
         equalD,
 
@@ -97,16 +107,16 @@ module mycpu_top(
 		memtoregW,regwriteW,
 		HLwriteW,stallW,flushW
 	);
-
+    //错误：时钟应该取反
 	datapath dp(
-		clk,rst,
+		~clk,rst,
 		//取指令阶段信号
 		pcF,
 		instrF,
 		//指令译码阶段信号
 		alucontrolD,
 		pcsrcD,branchD,
-		jumpD,jrD,
+		jumpD,jrD,jalD,balD,
 		equalD,
 		opD,functD,
 		InstrRtD,
@@ -120,8 +130,9 @@ module mycpu_top(
 		memtoregM,
 		regwriteM,
 		HLwriteM,BJalM,
-		aluoutM,writedataM,alucontrolM,
-		readdataM,readEnM,writeEnM,expectTypeM,
+        //错误：expectTypeM位置错误
+		aluoutM,writedataM,expectTypeM,alucontrolM,
+		readdataM,readEnM,writeEnM,
 		flushM,
 		//写回级信号
 		memtoregW,
@@ -132,6 +143,9 @@ module mycpu_top(
 		debug_wb_rf_wen,
 		debug_wb_rf_wnum,
 		debug_wb_rf_wdata,
+
+
+
 
 		rsE,rtE,rdE,
 	    rsD,rtD,rdD,

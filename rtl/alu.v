@@ -26,10 +26,12 @@ module alu#(parameter MUT_MAX=5)(
 	wire div_ready;
 	assign mut_div_stall=stall_mut|stall_div;
 	wire [31:0]mult_a,mult_b;
-	assign mult_a=((op==`EXE_MULT_OP)&a[31])?(~a+1):a;
-	assign mult_b=((op==`EXE_MULT_OP)&b[31])?(~b+1):b;
+	//错误：判断根据应该是a_reg而不是a
+	assign mult_a=((op==`EXE_MULT_OP)&a_reg[31])?(~a_reg+1):a_reg;
+	assign mult_b=((op==`EXE_MULT_OP)&b_reg[31])?(~b_reg+1):b_reg;
 	wire [63:0]HL_mut,HL_div,multOut;
-	assign HL_mut=((op==`EXE_MULT_OP)&(a[31]^b[31]))?~multOut+1:multOut;
+	//错误：这里也要判断根据应该是a_reg而不是a
+	assign HL_mut=((op==`EXE_MULT_OP)&(a_reg[31]^b_reg[31]))?~multOut+1:multOut;
 	wire mut_ready;
 	always @(*) begin
 		HiOutput<=HiInput;
@@ -129,6 +131,7 @@ module alu#(parameter MUT_MAX=5)(
 	//乘法状态机计数部分
 	//满足最大乘法器周期要求
 	reg [3:0]mult_count;
+	reg [31:0] a_reg,b_reg;
 	wire is_mut;
 	assign is_mut=(op==`EXE_MULT_OP)|(op==`EXE_MULTU_OP);
 	assign mut_ready=mult_count==MUT_MAX;
@@ -142,6 +145,24 @@ module alu#(parameter MUT_MAX=5)(
 			else
 			mult_count<=0;
 		end
+	end
+	//错误：严重bug，未固定乘法除法数
+	reg reg_control;
+	always@(posedge start_div or posedge start_mut or negedge clk)begin
+		if(clk)reg_control<=1;
+		else reg_control<=0;
+
+	end
+	always@(negedge clk)begin
+		if(reg_control)begin
+			a_reg<=a;
+			b_reg<=b;
+		end
+		else begin
+			a_reg<=a_reg;
+			b_reg<=b_reg;
+		end
+		
 	end
 
 	//例外部分，暂时不管
@@ -158,7 +179,7 @@ module alu#(parameter MUT_MAX=5)(
 	div alu_div(
 		clk,rst,
 		signed_div,
-		a,b,
+		a_reg,b_reg,
 		start_div,
 		clr_mut_div,
 		HL_div,

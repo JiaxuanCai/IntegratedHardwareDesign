@@ -8,7 +8,7 @@ module hazard(
 	//指令译码阶段信号
 	input wire[4:0] rsD,rtD,//指令译码阶段数据前推rs、rd寄存器
 	input wire branchD,//条件跳转指令，相等则分支
-	input wire jumpD,
+	input wire jumpD,jrD,
 	output wire forwardaD,forwardbD,//指令译码阶段数据前推rs、rd
 	output wire stallD,//译码级暂停控制信号，低电位有效
 	output wire flushD,
@@ -39,7 +39,7 @@ module hazard(
 	output lwstallD,branchstallD
 );
 
-
+	wire jrstallD;
 	// 分支指令 冒险 产生的数据前推
 	assign forwardaD = (rsD != 0 & rsD == writeregM & regwriteM);
 	assign forwardbD = (rtD != 0 & rtD == writeregM & regwriteM);
@@ -81,12 +81,12 @@ module hazard(
 
 	//分支指令的暂停控制信号  （属于控制冒险模块）
 	assign #1 branchstallD = branchD & ( regwriteE  &  (writeregE == rsD | writeregE == rtD)  |  memtoregM & (writeregM == rsD | writeregM == rtD) );
-
+	assign #1 jrstallD=(jumpD&jrD)&(regwriteE  &  (writeregE == rsD | writeregE == rtD)  |  memtoregM & (writeregM == rsD | writeregM == rtD) );
     //F级暂停
 	assign #1 stallF = stallD;
 
     //D级暂停
-	assign #1 stallD = lwstallD | branchstallD|mut_div_stallE;
+	assign #1 stallD = lwstallD | branchstallD|jrstallD|mut_div_stallE;
 
 	//E级暂停
 	assign #1 stallE=mut_div_stallE;
@@ -103,7 +103,7 @@ module hazard(
 	//E级刷新
 	//assign #1 flushE = lwstallD | branchstallD|jumpD;
 	//错误：不能根据branch或者jump刷新e级
-	assign #1 flushE = lwstallD| branchstallD;
+	assign #1 flushE = lwstallD| branchstallD|jumpD;
 
 	//M级刷新
 	assign #1 flushM=0;
