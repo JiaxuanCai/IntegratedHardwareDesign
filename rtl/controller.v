@@ -19,7 +19,7 @@ module controller(
 	output wire[7:0] alucontrolE,
 
 	//mem stage
-	output wire memtoregM,memwriteM,regwriteM,HLwriteM,BJalM,
+	output wire memtoregM,memwriteM,regwriteM,HLwriteM,BJalM,memenM,
 	output wire[7:0]alucontrolM,
 	input wire stallM,flushM,
 	
@@ -35,7 +35,7 @@ module controller(
 	wire writeTo31D,writeTo31E;
 	wire HLwriteD,HLwriteE;
 	//////////////////////////////////////
-	wire memenD;
+	wire memenD,memenE;
 	wire jalD,jrD,balD;//以后修改通路可能用
 	//////////////////////////////////////
 	wire BJalD;

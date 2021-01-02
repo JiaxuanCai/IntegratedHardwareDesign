@@ -204,7 +204,7 @@ module datapath(
 	flopenrc#(5) r6E(clk,rst,~stallE,flushE,rdD,rdE);
 	flopenrc#(5) r7E(clk,rst,~stallE,flushE,saD,saE);
 	flopenrc#(32) r8E(clk,rst,~stallE,flushE,pcplus4D,pcplus4E);
-	flopenrc #(32) r9E(clk,rst,~stallD,flushD,pcD,pcE);
+	flopenrc #(32) r9E(clk,rst,~stallE,flushE,pcD,pcE);
 
 	mux3 #(32) forwardaemux(srcaE,resultW,aluoutM,forwardaE,srca2E);
 	mux3 #(32) forwardbemux(srcbE,resultW,aluoutM,forwardbE,srcb2E);
@@ -228,7 +228,7 @@ module datapath(
 	flopenrc #(5) r3M(clk,rst,~stallM,flushM,writeregE,writeregM);
 	flopenrc #(64) r4M(clk,rst,~stallM,flushM,HLOutE,HLOutM);
 	flopenrc#(32) r5M(clk,rst,~stallM,flushM,pcplus4E,pcplus4M);
-	flopenrc #(32) r6M(clk,rst,~stallD,flushD,pcE,pcM);
+	flopenrc #(32) r6M(clk,rst,~stallM,flushM,pcE,pcM);
 	//错误：数据前推的需要，必须在M决定aluout
 	wire [31:0]pcplus8M;
 	assign pcplus8M=pcplus4M+4;
@@ -244,7 +244,7 @@ module datapath(
 	flopenrc #(32) r2W(clk,rst,~stallW,flushW,readdata_decodedM,readdataW);
 	flopenrc #(5) r3W(clk,rst,~stallW,flushW,writeregM,writeregW);
 	flopenrc #(64) r4W(clk,rst,~stallW,flushW,HLOutM,HLOutW);
-	flopenrc #(32) r5W(clk,rst,~stallD,flushD,pcM,pcW);
+	flopenrc #(32) r5W(clk,rst,~stallW,flushW,pcM,pcW);
 	//HL寄存器
 	hilo_reg hilorrg(clk,rst,HLwriteW,HLOutW[63:32],HLOutW[31:0],HLregW[63:32],HLregW[31:0]);
 
