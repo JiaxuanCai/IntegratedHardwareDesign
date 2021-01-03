@@ -5,10 +5,13 @@ module maindec(
 	input wire[5:0] op,
 	input wire[5:0] funct,
 	input wire[4:0] rt,
+	input [31:0] instr,
+	input stallD,
 	output wire memtoreg,memen,memwrite,
 	output wire branch,alusrc,
 	output wire regdst,regwrite,
 	output wire jump,
+	output wire cp0we,cp0read,eret,syscall,break,
 	output reg jal,jr,bal,writeTo31,
 	output reg HLwrite
 	//output wire[1:0] aluop
@@ -99,4 +102,14 @@ module maindec(
 			endcase
 		end
 	end
+
+assign break = (op == `EXE_SPECIAL_INST && funct == `EXE_BREAK)&& ~stallD;
+
+assign syscall = (op == `EXE_SPECIAL_INST && funct == `EXE_SYSCALL)&& ~stallD;
+
+assign eret = (instr == `EXE_ERET)&& ~stallD;
+
+assign cp0we = (instr[31:21] == 11'b01000000100 && instr[10:0] == 11'b00000000000); //MTC0
+
+assign cp0read = (instr[31:21] == 11'b01000000000 && instr[10:0] == 11'b00000000000); //MFC0
 endmodule

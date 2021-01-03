@@ -4,10 +4,19 @@ module aludec(
 	input wire [5:0]op,
 	input wire[5:0] funct,
 	input wire[4:0] rt,
-	output reg[7:0] alucontrol
+	input wire [31:0] instr,
+	input wire stallD,
+	output reg[7:0] alucontrol,
+	output wire invalidD
     );
 	always @(*) begin
-		if(op==`EXE_NOP)begin
+		if(instr == `EXE_ERET)
+			alucontrol <= `EXE_ERET_OP;
+		else if(instr[31:21] == 11'b01000000100)
+			alucontrol <= `EXE_MTC0_OP;
+		else if(instr[31:21] == 11'b01000000000)
+			alucontrol <= `EXE_MFC0_OP;
+		else if(op==`EXE_NOP)begin
 			case(funct)
 			//TODO
 
@@ -53,7 +62,8 @@ module aludec(
 			`EXE_JALR:alucontrol <= `EXE_JALR_OP;
 			//访存指令
 			//内陷指令
-			//特权指令
+			`EXE_BREAK:alucontrol <= `EXE_BREAK_OP;
+			`EXE_SYSCALL:alucontrol <= `EXE_SYSCALL_OP;
 			default:alucontrol <= 8'b0;
 		endcase
 		end
@@ -102,4 +112,7 @@ module aludec(
 		endcase
 		end
 	end
+
+	assign invalidD = (alucontrol == 8'b00000000 && ~stallD);
+
 endmodule
