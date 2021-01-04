@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 `include "defines.vh"
-`include "defines2.vh"
+//`include "defines2.vh"
 module cp0_reg(
 	input wire clk,
 	input wire rst,

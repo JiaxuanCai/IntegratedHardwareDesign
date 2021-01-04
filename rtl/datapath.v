@@ -23,7 +23,7 @@ module datapath(
 
 	//运算级信�?
 	input wire memtoregE,//指令执行级的存储器写寄存器控制信�?
-	input wire alusrcE,regdstE,//执行指令级寄存器来源//指令执行级目标寄存器
+	input wire alusrcE,regdstE,BJalE,//执行指令级寄存器来源//指令执行级目标寄存器
 	input wire regwriteE,writeTo31E,cp0readE,//计算级控制是否写入寄存器
 	input wire[7:0] alucontrolE,//计算单元计算类型选择
 	output wire flushE,//指令运算级刷新信�?
@@ -75,8 +75,8 @@ module datapath(
 
 
 	//指令译码阶段信号
-	wire [31:0] pcplus4D,instrD;
-	wire forwardaD,forwardbD;
+	wire [31:0] pcplus4D;
+	wire [1:0]forwardaD,forwardbD;
 	
 	wire [4:0] saD;
 	wire flushD;//stallD; 
@@ -99,10 +99,10 @@ module datapath(
 	wire [4:0] writeregE;
 	wire [31:0] signimmE;
 	wire [31:0] srcaE,srca2E,srcbE,srcb2E,srcb3E;
-	wire [31:0] aluoutE;
+	wire [31:0] aluoutE,aluoutEsrc;
 	wire [63:0] aluHLsrc;
 	wire [63:0] HLOutE;
-	wire cp0readE;
+	//wire cp0readE;
 	wire [1:0] forwardcp0E;
 	wire [7:0] exceptE;
 	wire is_in_delayslotE;
@@ -114,10 +114,10 @@ module datapath(
 	wire [63:0] HLOutM;
 	wire [31:0] pcplus4M;
 	wire[31:0]pcM;
-	wire flushM;
+	//wire flushM;
 	wire [4:0] rdM;
-	wire cp0weM;
-	wire flush_except;
+	//wire cp0weM;
+	//wire flush_except;
 	wire [31:0] newpcM;
 	wire is_in_delayslotM;
 	wire [7:0] exceptM;
@@ -132,7 +132,7 @@ module datapath(
 	wire [63:0] HLregW;
 	wire [31:0] pcplus4W;
 	wire [4:0] rdW;
-	wire flushW;
+	//wire flushW;
 	wire[31:0] count_oW,compare_oW,status_oW,cause_oW,epc_oW, config_oW,prid_oW,badvaddrW;
 
 
@@ -216,15 +216,15 @@ module datapath(
 	flopenrc #(32) r3D(clk,rst,~stallD,flushD,pcF,pcD);
 	flopenrc #(8) r4D(clk,rst,~stallD,flushD,exceptF,exceptD);
 	flopenrc #(8) r5D(clk,rst,~stallD,flushD,is_in_delayslotF,is_in_delayslotD);
-	flopenrc #(32) r6D(clk,rsk,~stallD,flushD,pcplus8F,pcplus8D);
+	flopenrc #(32) r6D(clk,rst,~stallD,flushD,pcplus8F,pcplus8D);
 
 	signext se(instrD[15:0],instrD[29:28],signimmD); //32位符号扩展立即数
 	sl2 immsh(signimmD,signimmshD); //地址计算部分
 
 	adder pcadd2(pcplus4D,signimmshD,pcbranchD);  //地址计算部分
 	
-	mux2 #(32) forwardamux(srcaD,aluoutM,forwardaD,srca2D);
-	mux2 #(32) forwardbmux(srcbD,aluoutM,forwardbD,srcb2D);
+	mux3 #(32) forwardamux(srcaD,aluoutM,aluoutE,forwardaD,srca2D);
+	mux3 #(32) forwardbmux(srcbD,aluoutM,aluoutE,forwardbD,srcb2D);
 	//eqcmp comp(srca2D,srcb2D,equalD);
 	BranchDec brdecode(srca2D,srcb2D,alucontrolD,brRest);
 
@@ -260,19 +260,22 @@ module datapath(
 	//错误日志：未加入overflow、zero导致对齐错误
 	pcflopenrc #(32) pcreg(clk,rst,~stallF,flushF,pcnextFD,newpcM,pcF);
 	// pc #(32) pcreg(clk,rst,~stallF,pcnextFD,pcF);  //地址计算部分
-	alu alu(clk,rst,clr_mut_divE,srca2E,srcb3E,alucontrolE,saE,aluoutE,aluHLsrc[63:32],aluHLsrc[31:0],cp0data2E,HLOutE[63:32],HLOutE[31:0],mut_div_stallE,overflowE,zeroE);
+	alu alu(clk,rst,clr_mut_divE,srca2E,srcb3E,alucontrolE,saE,aluoutEsrc,aluHLsrc[63:32],aluHLsrc[31:0],cp0data2E,HLOutE[63:32],HLOutE[31:0],mut_div_stallE,overflowE,zeroE);
 	//错误：必须加载E阶段
 	wire [4:0]writeregEsrc1;
 	mux2 #(5) wrmux(rtE,rdE,regdstE,writeregEsrc1);
-	mux2 #(5) wr2mux(writeregEsrc1,31,writeTo31E,writeregE);
+	mux2 #(5) wr2mux(writeregEsrc1,5'd31,writeTo31E,writeregE);
 	
 	assign clr_mut_divE=0;
 	//错误日志：写成了floprc
 	wire [31:0]writedataM;
+	wire [31:0]pcplus8M;
 	//内存访问级信号触发器
-	wire [31:0]aluoutMsrc;
+	//错误：数据前推的�?要，必须在E决定aluout
+	mux2 #(32) resmux2(aluoutEsrc,pcplus8E,BJalE,aluoutE);
+
 	flopenrc #(32) r1M(clk,rst,~stallM,flushM,srcb2E,writedataM);
-	flopenrc #(32) r2M(clk,rst,~stallM,flushM,aluoutE,aluoutMsrc);
+	flopenrc #(32) r2M(clk,rst,~stallM,flushM,aluoutE,aluoutM);
 	flopenrc #(5) r3M(clk,rst,~stallM,flushM,writeregE,writeregM);
 	flopenrc #(64) r4M(clk,rst,~stallM,flushM,HLOutE,HLOutM);
 	flopenrc#(32) r5M(clk,rst,~stallM,flushM,pcplus4E,pcplus4M);
@@ -281,8 +284,7 @@ module datapath(
 	flopenrc #(1) r8M(clk,rst,~stallM,flushM,is_in_delayslotE,is_in_delayslotM);
 	flopenrc #(8) r9M(clk,rst,~stallM,flushM,{exceptE[7:1],overflowE},exceptM);
 	flopenrc #(32) r10M(clk,rst,~stallM,flushM,pcplus8E,pcplus8M);
-	//错误：数据前推的�?要，必须在M决定aluout
-	mux2 #(32) resmux2(aluoutMsrc,pcplus8M,BJalM,aluoutM);
+	
 	//TODO
 	
     wire[31:0]readdata_decodedM;
@@ -291,7 +293,7 @@ module datapath(
 	memInsDecode memdec(alucontrolM,aluoutM[1:0],readdataM,writedataM,readdata_decodedM,writedata_decodedM,readEnM,writeEnM,adelM,adesM);
 	
 	//0103错误日志：顺序错�?
-	exception except(rst, cp0weW,exceptM,aluoutW,rdW,adelM,adesM,status_oW, cause_oW, epc_oW,exceptTypeM,newPcM);
+	exception except(rst, cp0weW,exceptM,aluoutW,rdW,adelM,adesM,status_oW, cause_oW, epc_oW,exceptTypeM,newpcM);
 	
 	assign bad_addrM = (exceptM[6])? pcM:(adelM | adesM)? aluoutM: 32'b0;
 

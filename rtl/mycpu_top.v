@@ -66,7 +66,7 @@ module mycpu_top(
 	wire [7:0] alucontrolE,alucontrolM;
 	wire flushE,equalD;
 	wire stallD,stallE,stallM,stallW,flushM,flushW;
-	wire writeTo31E,BJalM;
+	wire writeTo31E,BJalM,BJalE;
     wire [31:0]exceptTypeM;
 	wire cp0readE,cp0weM,cp0weW;
 	wire flush_except;
@@ -98,7 +98,7 @@ module mycpu_top(
 	equalD,stallD,eretD,syscallD,breakD,invalidD,
 	
 	//运算级信�?
-	flushE,stallE,
+	flushE,stallE,BJalE,
 	memtoregE,alusrcE,
 	regdstE,regwriteE,	writeTo31E,
 	alucontrolE,
@@ -133,7 +133,7 @@ module mycpu_top(
 		instrD,
 		//运算级信�?
 		memtoregE,
-		alusrcE,regdstE,
+		alusrcE,regdstE,BJalE,
 		regwriteE,writeTo31E,cp0readE,
 		alucontrolE,
 		flushE,

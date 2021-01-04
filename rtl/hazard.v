@@ -29,7 +29,7 @@ module hazard(
 	input wire[4:0] rsD,rtD,//指令译码阶段数据前推rs、rd寄存�?
 	input wire branchD,//条件跳转指令，相等则分支
 	input wire jumpD,jrD,
-	output wire forwardaD,forwardbD,//指令译码阶段数据前推rs、rd
+	output wire [1:0]forwardaD,forwardbD,//指令译码阶段数据前推rs、rd
 	output wire stallD,//译码级暂停控制信号，低电位有�?
 	output wire flushD,
 
@@ -69,8 +69,11 @@ module hazard(
 
 	wire jrstallD;
 	// 分支指令 冒险 产生的数据前�?
-	assign forwardaD = (rsD != 0 & rsD == writeregM & regwriteM);
-	assign forwardbD = (rtD != 0 & rtD == writeregM & regwriteM);
+	//错误0104：选择D阶段信号判断
+	assign forwardaD = ( rsD!=0  &  writeregE == rsD & regwriteE)?2'b10:
+									(rsD != 0 & rsD == writeregM & regwriteM)?2'b01:2'b00;
+	assign forwardbD = ( rtD!=0  &  writeregE == rtD & regwriteE)?2'b10:
+									(rtD != 0 & rtD == writeregM & regwriteM)?2'b01:2'b00;
 	
 	//运算级数据前�?
 	always @(*) begin
@@ -117,8 +120,8 @@ module hazard(
 	assign #1 lwstallD = memtoregE & (rtE == rsD | rtE == rtD);
 	assign flush_except = (|except_typeM);
 	//分支指令的暂停控制信�?  （属于控制冒险模块）
-	assign #1 branchstallD = branchD & ( regwriteE  &  (writeregE == rsD | writeregE == rtD)  |  memtoregM & (writeregM == rsD | writeregM == rtD) );
-	assign #1 jrstallD=(jumpD&jrD)&(regwriteE  &  (writeregE == rsD | writeregE == rtD)  |  memtoregM & (writeregM == rsD | writeregM == rtD) );
+	assign #1 branchstallD = branchD & ( memtoregE  &  (writeregE == rsD | writeregE == rtD)  |  memtoregM & (writeregM == rsD | writeregM == rtD) );
+	assign #1 jrstallD=(jumpD&jrD)&(memtoregE  &  (writeregE == rsD | writeregE == rtD)  |  memtoregM & (writeregM == rsD | writeregM == rtD) );
     //F级暂�?
 	assign #1 stallF = stallD;
 

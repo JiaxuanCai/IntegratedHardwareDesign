@@ -1,10 +1,10 @@
 `timescale 1ns / 1ps
 `include "defines.vh"
 /////////////////////////////////
-//alu辅助了一部分controller的�?�辑
+//alu辅助了一部分controller的�?�辑
 module alu#(parameter MUT_MAX=5)(
 	input wire clk,rst,clr_mut_div,
-	input wire[31:0] a,b,//第一个操作数和第二个操作数（rs、rt）（rs，imm�?
+	input wire[31:0] a,b,//第一个操作数和第二个操作数（rs、rt）（rs，imm�?
 	input wire[7:0] op,
 	input wire[4:0] sa,
 	output reg[31:0] y,
@@ -16,10 +16,10 @@ module alu#(parameter MUT_MAX=5)(
 	output reg overflow,
 	output wire zero
     );
-	
+	reg [31:0] a_reg,b_reg;
 	wire[31:0] s,bout;
 	wire subfunc;
-	//错误：subu忘了�?
+	//错误：subu忘了�?
 	assign subfunc=op==`EXE_SUB_OP|op==`EXE_SUBU_OP|op==`EXE_SLT_OP|op==`EXE_SLTI_OP|op==`EXE_SLTU_OP|op==`EXE_SLTIU_OP;
 	assign bout = subfunc ? ~b : b;
 	assign s = a + bout + subfunc;
@@ -45,7 +45,7 @@ module alu#(parameter MUT_MAX=5)(
 			`EXE_NOR_OP:y<=~(a|b);
 			`EXE_LUI_OP:y<={b[15:0],16'b0};
 			//移位指令
-			//错误�?'a' is not a constant
+			//错误�?'a' is not a constant
 			//`EXE_SLL_OP:y<={b[31-sa:0],zerowire[sa:0]};
 			`EXE_SLL_OP:y<=b<<sa;
 			`EXE_SRL_OP:y<=b>>sa;
@@ -71,7 +71,7 @@ module alu#(parameter MUT_MAX=5)(
 				HiOutput<=HL_div[63:32];
 				LoOutput<=HL_div[31:0];
 			end
-			//错误：�?�辑错误
+			//错误：�?�辑错误
 			//a负b正必真，否则不能a正b负且减法结果为负
 			`EXE_SLT_OP,`EXE_SLTI_OP:y <= (a[31]&~b[31])?1:
 												s[31]&~(~a[31]&b[31]);
@@ -88,7 +88,7 @@ module alu#(parameter MUT_MAX=5)(
 	end
 	assign zero = (y == 32'b0);
 	
-	//乘除状�?�机
+	//乘除状�?�机
 	always@(*)begin
 		start_mut<=1'b0;
 		stall_mut<=1'b0;
@@ -131,14 +131,14 @@ module alu#(parameter MUT_MAX=5)(
 		end
 		endcase
 	end	
-	//乘法状�?�机计数部分
-	//满足�?大乘法器周期要求
+	//乘法状�?�机计数部分
+	//满足�?大乘法器周期要求
 	reg [3:0]mult_count;
-	reg [31:0] a_reg,b_reg;
+	
 	wire is_mut;
 	assign is_mut=(op==`EXE_MULT_OP)|(op==`EXE_MULTU_OP);
 	assign mut_ready=mult_count==MUT_MAX;
-	//op为乘，开始加，加到MUT_MAX乘法结果完成，归零�?�同时流水线重启，下�?个op到来
+	//op为乘，开始加，加到MUT_MAX乘法结果完成，归零�?�同时流水线重启，下�?个op到来
 	always@(posedge clk)begin
 		if(rst) begin
 			mult_count<=0;
@@ -149,7 +149,7 @@ module alu#(parameter MUT_MAX=5)(
 			mult_count<=0;
 		end
 	end
-	//错误：严重bug，未固定乘法除法�?
+	//错误：严重bug，未固定乘法除法�?
 	reg reg_control;
 	always@(posedge start_div or posedge start_mut or negedge clk)begin
 		if(clk)reg_control<=1;
@@ -168,7 +168,7 @@ module alu#(parameter MUT_MAX=5)(
 		
 	end
 
-	//例外部分，暂时不�?
+	//例外部分，暂时不�?
 	//TODO
 	always @(*) begin
 		case (op)

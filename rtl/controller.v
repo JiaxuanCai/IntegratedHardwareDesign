@@ -15,7 +15,7 @@ module controller(
 	output eretD,syscallD,breakD,invalidD,
 	
 	//execute stage
-	input wire flushE,stallE,
+	input wire flushE,stallE,BJalE,
 	output wire memtoregE,alusrcE,
 	output wire regdstE,regwriteE,writeTo31E,
 	output wire[7:0] alucontrolE,
@@ -44,14 +44,13 @@ module controller(
 	wire HLwriteD,HLwriteE;
 	//////////////////////////////////////
 	wire memenD,memenE;
-	wire jrD,balD;//以后修改通路可能用
 	//////////////////////////////////////
 	wire BJalD;
 	assign BJalD=jalD|balD|jrD;
 	//execute stage
 	
 	wire memwriteE;
-	wire BJalE,BJalW;
+	wire BJalW;
 
 	maindec md(
 	opD,
