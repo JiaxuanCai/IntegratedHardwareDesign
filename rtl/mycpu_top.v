@@ -45,7 +45,9 @@ module mycpu_top(
     output wire [31:0]debug_wb_rf_wdata
     );
     wire rst;
+    wire [1:0]size;
     assign rst=~resetn;
+	wire [31:0] data_paddr,inst_paddr;
     wire [31:0]instrF;
     wire [31:0]pcF;
 	wire [5:0] opD,functD;
@@ -76,14 +78,14 @@ module mycpu_top(
 	wire eretD,syscallD,breakD,invalidD;
     assign inst_sram_en=1'b1;
     assign inst_sram_wen=4'b0;
-    assign inst_sram_addr=pcF;
+    assign inst_sram_addr=inst_paddr;
     assign inst_sram_wdata=32'b0;
     assign instrF=inst_sram_rdata;
 
     assign data_sram_en=memenM&~(|exceptTypeM);
     assign data_sram_wen=writeEnM;
     //错误：地�?转换，de了五个小�?
-    assign data_sram_addr=aluoutM[31]?{3'b0,aluoutM[28:0]}:aluoutM;
+    assign data_sram_addr=data_paddr;
     assign data_sram_wdata=writedataM;
     assign readdataM=data_sram_rdata;
 
@@ -144,6 +146,7 @@ module mycpu_top(
         //错误：expectTypeM位置错误
 		aluoutM,writedataM,exceptTypeM,alucontrolM,
 		readdataM,cp0weM,readEnM,writeEnM,
+		size,
 		flushM, flush_except,
 		//写回级信�?
 		memtoregW,
@@ -167,6 +170,13 @@ module mycpu_top(
 		stallE,
 		stallM,
 		stallW
+	);
+	mmu addrTrans(
+		pcF,
+		inst_paddr,
+		aluoutM,
+		data_paddr,
+		no_dcache    //是否经过d cache
 	);
 
 	

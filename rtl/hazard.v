@@ -146,7 +146,8 @@ module hazard(
 	//E级刷�?
 	//assign #1 flushE = lwstallD | branchstallD|jumpD;
 	//错误：不能根据branch或�?�jump刷新e�?
-	assign #1 flushE = lwstallD | branchstallD | jumpD | flush_except;
+	//assign #1 flushE = lwstallD | branchstallD | jumpD | flush_except;
+	assign #1 flushE = lwstallD | branchstallD| flush_except;
 
 	//M级刷�?
 	assign #1 flushM=flushF;

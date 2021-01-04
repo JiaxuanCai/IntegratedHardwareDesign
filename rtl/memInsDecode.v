@@ -27,7 +27,8 @@ module memInsDecode(
     input wire[31:0]readdata,writedata,
     output reg[31:0]readdataOut,writedataOut,
     output reg[3:0]readEn,writeEn,
-    output reg read_addr_error,wirte_addr_error
+    output reg read_addr_error,wirte_addr_error,
+    output wire [1:0]size
     );
     always@(*)begin
         readEn<=4'b0;writeEn<=4'b0;
@@ -94,7 +95,10 @@ module memInsDecode(
         wirte_addr_error<=(op == `EXE_SH_OP & endOfAddr[0]) | (op == `EXE_SW_OP & endOfAddr != 2'b00);
     end
     
-
+    assign size = (op == `EXE_LW_OP || op == `EXE_SW_OP)? 2'b10:
+              (op == `EXE_LH_OP || op == `EXE_LHU_OP || op == `EXE_SH_OP)? 2'b01:
+              (op == `EXE_LB_OP || op == `EXE_LBU_OP || op == `EXE_SB_OP)? 2'b00:
+              2'b00;
 
 
 

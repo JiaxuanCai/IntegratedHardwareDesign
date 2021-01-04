@@ -39,6 +39,7 @@ module datapath(
 	input wire[31:0] readdataM,//内存级读出的数据
 	input wire cp0weM,
 	output wire [3:0]readEnM,writeEnM,
+	output wire [1:0]size,
 	output wire flushM,flush_except,
 
 	//写回级信�?
@@ -133,7 +134,7 @@ module datapath(
 	wire [31:0] pcplus4W;
 	wire [4:0] rdW;
 	//wire flushW;
-	wire[31:0] count_oW,compare_oW,status_oW,cause_oW,epc_oW, config_oW,prid_oW,badvaddrW;
+	wire[31:0] count_oW,compare_oW,status_oW,cause_oW,epc_oW, config_oW,prid_oW,badvaddr;
 
 
 	//冒险模块
@@ -260,7 +261,7 @@ module datapath(
 	//错误日志：未加入overflow、zero导致对齐错误
 	pcflopenrc #(32) pcreg(clk,rst,~stallF,flushF,pcnextFD,newpcM,pcF);
 	// pc #(32) pcreg(clk,rst,~stallF,pcnextFD,pcF);  //地址计算部分
-	alu alu(clk,rst,clr_mut_divE,srca2E,srcb3E,alucontrolE,saE,aluoutEsrc,aluHLsrc[63:32],aluHLsrc[31:0],cp0data2E,HLOutE[63:32],HLOutE[31:0],mut_div_stallE,overflowE,zeroE);
+	alu alu(clk,rst,clr_mut_divE,srca2E,srcb3E,alucontrolE,saE,aluoutEsrc,aluHLsrc[63:32],aluHLsrc[31:0],cp0data2E,HLOutE[63:32],HLOutE[31:0],mut_div_stallE,flush_except,overflowE,zeroE);
 	//错误：必须加载E阶段
 	wire [4:0]writeregEsrc1;
 	mux2 #(5) wrmux(rtE,rdE,regdstE,writeregEsrc1);
@@ -290,7 +291,7 @@ module datapath(
     wire[31:0]readdata_decodedM;
 	//0104 变量名写错了
     wire adelM,adesM;
-	memInsDecode memdec(alucontrolM,aluoutM[1:0],readdataM,writedataM,readdata_decodedM,writedata_decodedM,readEnM,writeEnM,adelM,adesM);
+	memInsDecode memdec(alucontrolM,aluoutM[1:0],readdataM,writedataM,readdata_decodedM,writedata_decodedM,readEnM,writeEnM,adelM,adesM,size);
 	
 	//0103错误日志：顺序错�?
 	exception except(rst, cp0weW,exceptM,aluoutW,rdW,adelM,adesM,status_oW, cause_oW, epc_oW,exceptTypeM,newpcM);
@@ -310,14 +311,14 @@ module datapath(
 
 	//HL寄存�?
 	hilo_reg hilorrg(clk,rst,HLwriteW,HLOutW[63:32],HLOutW[31:0],HLregW[63:32],HLregW[31:0]);
-
+	//错误0104 环路问题badvaddr
 	cp0_reg cp0(
 		.clk(clk),.rst(rst),.we_i(cp0weW),.waddr_i(rdW),.raddr_i(rdE),
 		.data_i(aluoutW),.int_i(6'b000000),.excepttype_i(exceptTypeM),
 		.current_inst_addr_i(pcM),.is_in_delayslot_i(is_in_delayslotM),
 		.bad_addr_i(bad_addrM),.data_o(cp0dataE),.count_o(count_oW),
 		.compare_o(compare_oW),.status_o(status_oW),.cause_o(cause_oW),
-		.epc_o(epc_oW),.config_o(config_oW),.prid_o(prid_oW),.badvaddr(bad_addrM));
+		.epc_o(epc_oW),.config_o(config_oW),.prid_o(prid_oW),.badvaddr(badvaddr));
 	
 	mux2 #(32) resmux(aluoutW,readdataW,memtoregW,resultW);
 	

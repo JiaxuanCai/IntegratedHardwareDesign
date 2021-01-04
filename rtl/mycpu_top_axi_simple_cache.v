@@ -18,7 +18,7 @@
 // Additional Comments:
 // 
 //////////////////////////////////////////////////////////////////////////////////
-`include "defines.h"
+`include "defines.vh"
 
 module mycpu_top(
 	input wire[5:0] int,
@@ -89,6 +89,8 @@ module mycpu_top(
 	wire [31:0] data_sram_addr;
 	wire [31:0] data_sram_wdata;
 	wire [31:0] data_sram_rdata;
+
+	wire [31:0] data_paddr,inst_paddr;
 
 
 
@@ -229,7 +231,7 @@ module mycpu_top(
 		stallM,
 		stallW);
 	wire no_dcache;
-	wire [31:0] data_paddr,inst_paddr;
+	
 	mmu addrTrans(
 		pcF,
 		inst_paddr,

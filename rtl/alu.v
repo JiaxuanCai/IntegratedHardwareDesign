@@ -12,6 +12,7 @@ module alu#(parameter MUT_MAX=5)(
 	input wire[31:0] cp0data,
 	output reg [31:0] HiOutput,LoOutput,
 	output wire mut_div_stall,
+	input wire flush_except,
 
 	output reg overflow,
 	output wire zero
@@ -50,9 +51,10 @@ module alu#(parameter MUT_MAX=5)(
 			`EXE_SLL_OP:y<=b<<sa;
 			`EXE_SRL_OP:y<=b>>sa;
 			`EXE_SRA_OP:y<=($signed(b))>>>sa;
-			`EXE_SLLV_OP:y<=b<<a;
-			`EXE_SRLV_OP:y<=b>>a;
-			`EXE_SRAV_OP:y<=($signed(b))>>>a;
+			//错误0104：严重bug，取后五位
+			`EXE_SLLV_OP:y<=b<<a[4:0];
+			`EXE_SRLV_OP:y<=b>>a[4:0];
+			`EXE_SRAV_OP:y<=($signed(b))>>>a[4:0];
 			//数据移动指令
 			`EXE_MFHI_OP:y<=HiInput;
 			`EXE_MFLO_OP:y<=LoInput;
@@ -139,8 +141,9 @@ module alu#(parameter MUT_MAX=5)(
 	assign is_mut=(op==`EXE_MULT_OP)|(op==`EXE_MULTU_OP);
 	assign mut_ready=mult_count==MUT_MAX;
 	//op为乘，开始加，加到MUT_MAX乘法结果完成，归零�?�同时流水线重启，下�?个op到来
+	//错误0104：严重bug，syscall导致刷新，计数器未变，导致乘法提前出了错误结果
 	always@(posedge clk)begin
-		if(rst) begin
+		if(rst|flush_except) begin
 			mult_count<=0;
 		end else if(is_mut)begin
 			if(mult_count!=MUT_MAX)
@@ -180,7 +183,7 @@ module alu#(parameter MUT_MAX=5)(
 		endcase	
 	end
 	div alu_div(
-		clk,rst,
+		clk,rst|flush_except,
 		signed_div,
 		a_reg,b_reg,
 		start_div,

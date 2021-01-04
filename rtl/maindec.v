@@ -80,6 +80,12 @@ module maindec(
 			//访存指令
 			`EXE_LW,`EXE_LB,`EXE_LBU,`EXE_LH,`EXE_LHU,`EXE_LW:controls <= 7'b1010010;
 			`EXE_SW,`EXE_SB,`EXE_SH:controls <= 7'b0010100;
+			//错误0104逻辑没有添加
+			//错误0104 应该为00000
+			//错误0104，此外的逻辑beginend
+			6'b010000:begin if(instr[25:21]==5'b00000)controls<=7'b1000000;//MFC0
+			else controls<=7'b0000000;//除MFC0
+			end
 			//内陷指令
 			//特权指令
 			default:  controls <= 7'b0000000;

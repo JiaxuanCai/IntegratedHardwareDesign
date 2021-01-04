@@ -18,10 +18,10 @@
 // Additional Comments:
 // 
 //////////////////////////////////////////////////////////////////////////////////
-`include "defines.h"
+`include "defines.vh"
 
 module mycpu_top(
-	input wire[5:0] int,
+	input wire[5:0] ext_int,
 	input wire aclk,aresetn,
 	
 	 // axi port
@@ -94,12 +94,13 @@ module mycpu_top(
 
 	wire rst,clk;
 	assign clk=aclk;
-    assign rst=aresetn;
+    assign rst=~aresetn;
 	
     wire [31:0]instrF;
     wire [31:0]pcF;
 	wire [5:0] opD,functD;
 	wire [4:0] InstrRtD;
+	wire [31:0]instrD;
     wire branchD,jumpF,memwriteM;
     wire [31:0] aluoutM,writedataM;
     wire [3:0] readEnM,writeEnM;
@@ -115,7 +116,6 @@ module mycpu_top(
 	wire flushE,equalD;
 	wire stallD,stallE,stallM,stallW,flushM,flushW;
 	wire writeTo31E,BJalM;
-    wire [7:0]expectTypeM;
     wire [31:0] readdataM;
     wire memenM;
 
@@ -131,6 +131,7 @@ module mycpu_top(
 	wire[31:0] mem_st_data,mem_data;
 	wire[1:0] mem_size,d_size;// size not use
 	wire[3:0] m_sel,d_wen;
+	wire [31:0]exceptTypeM;
 	wire stallreq_from_if,stallreq_from_mem;
 
 
@@ -143,7 +144,7 @@ module mycpu_top(
 	assign instrF = inst_sram_rdata; // use your own signal from F stage
 
 	//assign the data_sram_parameters
-	assign data_sram_en = memenM&~(|expectTypeM);// notice: disable the data strobe when exceptions occur
+	assign data_sram_en = memenM&~(|exceptTypeM);// notice: disable the data strobe when exceptions occur
 	assign data_sram_write = memwriteM; // 0 read, 1 write
 	assign data_sram_wen = writeEnM;
 	assign data_sram_addr = aluoutM[31]?{3'b0,aluoutM[28:0]}:aluoutM;
@@ -153,69 +154,72 @@ module mycpu_top(
 
 	// these modules use your own
 	controller c(
+		instrD,
 		clk,rst,
 		//取指令阶段信号
 		alucontrolD,
 		opD,functD,InstrRtD,
 		pcsrcD,branchD,jumpD,jrD,jalD,balD,
 		
-        equalD,
+        equalD,stallD,
+		eretD,syscallD,breakD,invalidD,
 
 		//运算级信号
-		flushE,stallE,
+		flushE,stallE,BJalE,
 		memtoregE,alusrcE,
 		regdstE,regwriteE,	writeTo31E,
 		alucontrolE,
+		cp0readE,
 
 		//内存访问级信号
 		memtoregM,memwriteM,
 		regwriteM,HLwriteM,BJalM,memenM,alucontrolM,
 		stallM,flushM,
+		cp0weM,
 		//写回级信号
 		memtoregW,regwriteW,
-		HLwriteW,stallW,flushW
+		HLwriteW,stallW,flushW,
+		cp0weW
 	);
 	datapath dp(
 		clk,rst,
-		//取指令阶段信号
+		//取指令阶段信�?
 		pcF,
 		instrF,
 		//指令译码阶段信号
 		alucontrolD,
 		pcsrcD,branchD,
 		jumpD,jrD,jalD,balD,
+		eretD,syscallD,breakD,invalidD,
 		equalD,
 		opD,functD,
 		InstrRtD,
-		//运算级信号
+		instrD,
+		//运算级信�?
 		memtoregE,
-		alusrcE,regdstE,
-		regwriteE,writeTo31E,
+		alusrcE,regdstE,BJalE,
+		regwriteE,writeTo31E,cp0readE,
 		alucontrolE,
 		flushE,
-		//内存访问级信号
+		//内存访问级信�?
 		memtoregM,
 		regwriteM,
 		HLwriteM,BJalM,
         //错误：expectTypeM位置错误
-		aluoutM,writedataM,expectTypeM,alucontrolM,
-		readdataM,readEnM,writeEnM,
-		//////////////////////////////////////////////
+		aluoutM,writedataM,exceptTypeM,alucontrolM,
+		readdataM,cp0weM,readEnM,writeEnM,
 		data_sram_size,
-		flushM,
-		//写回级信号
+		flushM, flush_except,
+		//写回级信�?
 		memtoregW,
 		regwriteW,
 		HLwriteW,
+		cp0weW,
 		flushW,
 		debug_wb_pc,
 		debug_wb_rf_wen,
 		debug_wb_rf_wnum,
 		debug_wb_rf_wdata,
-
-
-
-
 		rsE,rtE,rdE,
 	    rsD,rtD,rdD,
 		lwstallD,branchstallD,
@@ -223,7 +227,8 @@ module mycpu_top(
 	    stallD,
 		stallE,
 		stallM,
-		stallW);
+		stallW
+	);
 	
 
 	// use a inst_miss signal to denote that the instruction is not loadssss
@@ -282,7 +287,7 @@ module mycpu_top(
 		.mem_st_data(mem_st_data),
 		.mem_data(mem_data),
 		// add a input signal 'flush', cancel the memory accessing operation in axi_interface, do not need any extra design. 
-		.flush(|excepttypeM), // use excepetion type
+		.flush(|exceptTypeM), // use excepetion type
 
 		.arid      (arid      ),
 		.araddr    (araddr    ),
