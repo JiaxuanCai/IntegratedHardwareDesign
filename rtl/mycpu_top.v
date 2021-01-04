@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 //封装成Sram接口
-//参�?�https://www.bilibili.com/video/BV1XJ411k7kR?p=3
+//参�?�https://www.bilibili.com/video/BV1XJ411k7kR?p=3
 
 module mycpu_top(
     input wire clk,resetn,
@@ -51,7 +51,7 @@ module mycpu_top(
 	wire [5:0] opD,functD;
 	wire [4:0] InstrRtD;
 	wire [31:0] instrD;
-    wire branchD,jumpF,memwriteM;
+    wire branchD,memwriteM;
     wire [31:0] aluoutM,writedataM;
     wire [3:0] readEnM,writeEnM;
     wire [4:0] rsE,rtE,rdE,rsD,rtD,rdD;
@@ -61,16 +61,16 @@ module mycpu_top(
 	wire regdstE,alusrcE,pcsrcD,memtoregE,memtoregM,memtoregW;
 	wire regwriteE,regwriteM,regwriteW;
 	wire HLwriteM,HLwriteW;
-	//错误：这里没有加，导致z,�?定要看warning
+	//错误：这里没有加，导致z,�?定要看warning
 	wire [7:0] alucontrolD;
 	wire [7:0] alucontrolE,alucontrolM;
 	wire flushE,equalD;
 	wire stallD,stallE,stallM,stallW,flushM,flushW;
 	wire writeTo31E,BJalM;
-    wire [7:0]exceptTypeM;
+    wire [31:0]exceptTypeM;
 	wire cp0readE,cp0weM,cp0weW;
 	wire flush_except;
-    //严重错误：忘记写导致readdataM只有1�?
+    //严重错误：忘记写导致readdataM只有1�?
     wire [31:0] readdataM;
     wire memenM;
 	wire eretD,syscallD,breakD,invalidD;
@@ -82,7 +82,7 @@ module mycpu_top(
 
     assign data_sram_en=memenM&~(|exceptTypeM);
     assign data_sram_wen=writeEnM;
-    //错误：地�?转换，de了五个小�?
+    //错误：地�?转换，de了五个小�?
     assign data_sram_addr=aluoutM[31]?{3'b0,aluoutM[28:0]}:aluoutM;
     assign data_sram_wdata=writedataM;
     assign readdataM=data_sram_rdata;
@@ -90,36 +90,36 @@ module mycpu_top(
 	controller c(
 	instrD,
 	~clk,rst,
-	//取指令阶段信�?
+	//取指令阶段信�?
 	alucontrolD,
 	opD,functD,InstrRtD,
 	pcsrcD,branchD,jumpD,jrD,jalD,balD,
 
 	equalD,stallD,eretD,syscallD,breakD,invalidD,
 	
-	//运算级信�?
+	//运算级信�?
 	flushE,stallE,
 	memtoregE,alusrcE,
 	regdstE,regwriteE,	writeTo31E,
 	alucontrolE,
 	cp0readE,
 
-	//内存访问级信�?
+	//内存访问级信�?
 	memtoregM,memwriteM,
 	regwriteM,HLwriteM,BJalM,memenM,alucontrolM,
 	stallM,flushM,
 	cp0weM,
 	
-	//写回级信�?
+	//写回级信�?
 	memtoregW,regwriteW,
 	HLwriteW,stallW,flushW,
 	cp0weW
 );
 
-    //错误：时钟应该取�?
+    //错误：时钟应该取�?
 	datapath dp(
 		~clk,rst,
-		//取指令阶段信�?
+		//取指令阶段信�?
 		pcF,
 		instrF,
 		//指令译码阶段信号
@@ -131,13 +131,13 @@ module mycpu_top(
 		opD,functD,
 		InstrRtD,
 		instrD,
-		//运算级信�?
+		//运算级信�?
 		memtoregE,
 		alusrcE,regdstE,
 		regwriteE,writeTo31E,cp0readE,
 		alucontrolE,
 		flushE,
-		//内存访问级信�?
+		//内存访问级信�?
 		memtoregM,
 		regwriteM,
 		HLwriteM,BJalM,
@@ -145,7 +145,7 @@ module mycpu_top(
 		aluoutM,writedataM,exceptTypeM,alucontrolM,
 		readdataM,cp0weM,readEnM,writeEnM,
 		flushM, flush_except,
-		//写回级信�?
+		//写回级信�?
 		memtoregW,
 		regwriteW,
 		HLwriteW,

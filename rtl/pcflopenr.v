@@ -1,29 +1,11 @@
 `timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date: 2019/12/06 23:55:54
-// Design Name: 
-// Module Name: pcfolpenr
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
-//////////////////////////////////////////////////////////////////////////////////
 
+//参考https://github.com/JF2098/A-simple-MIPS-CPU/tree/master/rtl
 module pcflopenrc #(parameter WIDTH = 8)(
-input wire clk,rst,en,flush,
-input wire[WIDTH-1:0] d,
-input wire[WIDTH-1:0] newpc,
-output reg[WIDTH-1:0] q
+    input wire clk,rst,en,flush,
+    input wire[WIDTH-1:0] d,
+    input wire[WIDTH-1:0] newpc,
+    output reg[WIDTH-1:0] q
     );
 
 initial begin

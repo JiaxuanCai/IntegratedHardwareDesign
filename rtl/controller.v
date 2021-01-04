@@ -2,7 +2,7 @@
 
 
 module controller(
-	input wire instrD,
+	input wire [31:0] instrD,
 	input wire clk,rst,
 	
 	//decode stage
