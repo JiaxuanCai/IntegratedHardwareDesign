@@ -53,6 +53,7 @@ module datapath(
 	output wire [4:0]writeregW,
 	output wire [31:0]resultW,
 	input wire stallreq_from_if, stallreq_from_mem,
+	output wire stallreq_from_ifW,
 	
 
 	output wire [4:0] rsE,rtE,rdE,
@@ -303,6 +304,8 @@ module datapath(
 	wire [3:0]writeEnW;
 
 	//写回级信号触发器
+	//错误0104 需要将stallreq_from_if流水下去，在w阶段用来判断是否要将debug信号值1
+	//并且stall时要将流水线传出去值置位0。但只能w阶段用这种流水器否则信号会反复跳
 	flopenrc #(32) r1W(clk,rst,~stallW,flushW,aluoutM,aluoutW);
 	flopenrc #(32) r2W(clk,rst,~stallW,flushW,readdata_decodedM,readdataW);
 	flopenrc #(5) r3W(clk,rst,~stallW,flushW,writeregM,writeregW);
@@ -323,5 +326,11 @@ module datapath(
 		.epc_o(epc_oW),.config_o(config_oW),.prid_o(prid_oW),.badvaddr(badvaddr));
 	
 	mux2 #(32) resmux(aluoutW,readdataW,memtoregW,resultW);
+
+	wire stallreq_from_ifE,stallreq_from_ifM,stallreq_from_ifW;
+
+	flopenrc #(4)reqstallE(clk,rst,~stallE,flushE,stallreq_from_if,stallreq_from_ifE);
+	flopenrc #(4)reqstallM(clk,rst,~stallM,flushM,stallreq_from_ifE,stallreq_from_ifM);
+	flopenrc #(4)reqstallW(clk,rst,~stallW,flushW,stallreq_from_ifM,stallreq_from_ifW);
 	
 endmodule

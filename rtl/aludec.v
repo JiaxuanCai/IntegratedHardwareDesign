@@ -10,7 +10,10 @@ module aludec(
 	output wire invalidD
     );
 	always @(*) begin
-		if(instr == `EXE_ERET)
+		if(stallD)begin
+			alucontrol<=8'b0;
+		end
+		else if(instr == `EXE_ERET)
 			alucontrol <= `EXE_ERET_OP;
 		else if(instr[31:21] == 11'b01000000100)
 			alucontrol <= `EXE_MTC0_OP;

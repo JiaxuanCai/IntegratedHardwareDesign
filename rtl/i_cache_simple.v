@@ -9,7 +9,7 @@ module i_cache_simple #(parameter A_WIDTH = 32, parameter C_INDEX = 6)
     input flush_except,
     input clk,clrn,
 
-    output [A_WIDTH:0] m_a,
+    output [A_WIDTH-1:0] m_a,
     input [31:0] m_dout,
     output m_strobe,
     input m_ready

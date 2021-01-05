@@ -74,7 +74,8 @@ module mycpu_top(
 	output wire [31:0] debug_wb_rf_wdata
 
     );
-
+	wire [3:0]debug_wb_rf_wen_ori;
+	assign debug_wb_rf_wen={4{(|debug_wb_rf_wen_ori)&~stallreq_from_ifW}};
 	//sram signal
 	//cpu inst sram
 	wire        inst_sram_en;
@@ -217,11 +218,12 @@ module mycpu_top(
 		cp0weW,
 		flushW,
 		debug_wb_pc,
-		debug_wb_rf_wen,
+		debug_wb_rf_wen_ori,
 		debug_wb_rf_wnum,
 		debug_wb_rf_wdata,
 		stallreq_from_if,
 		stallreq_from_mem,
+		stallreq_from_ifW,
 		rsE,rtE,rdE,
 	    rsD,rtD,rdD,
 		lwstallD,branchstallD,
@@ -274,6 +276,8 @@ module mycpu_top(
 	//
 	assign stallreq_from_if = ~m_i_ready;
 	assign stallreq_from_mem = data_sram_en & ~m_d_ready;
+	//错误0105 固定操作数
+
 
 	axi_interface interface(
 		.clk(aclk),

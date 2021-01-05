@@ -16,10 +16,10 @@ module maindec(
 	output reg HLwrite
 	//output wire[1:0] aluop
     );
-	reg[7:0] controls;
+	reg[6:0] controls;
 	assign {regwrite,regdst,alusrc,branch,memwrite,memtoreg,jump} = controls;
 	assign memen = (op == `EXE_LB)||(op == `EXE_LBU)||(op == `EXE_LH)||
-                (op == `EXE_LHU)||(op == `EXE_LW)||(op == `EXE_SB)||(op == `EXE_SH)||(op == `EXE_SW);
+                (op == `EXE_LHU)||(op == `EXE_LW)||(op == `EXE_SB)||(op == `EXE_SH)||(op == `EXE_SW)&& ~stallD;
 
 	//op觉得控制信号
 	always @(*) begin
@@ -90,6 +90,14 @@ module maindec(
 			//特权指令
 			default:  controls <= 7'b0000000;
 		endcase
+		end
+		////////////////////////////////////////
+		//错误0106：及其严重的bug，导致了一天的debug
+		//只能在不stall的时候出结果，否则trace无法判断。其实不算bug。
+		if(stallD)begin
+			controls[6]<=0;
+			controls[4]<=0;
+			controls[1]<=0;
 		end
 	end
 

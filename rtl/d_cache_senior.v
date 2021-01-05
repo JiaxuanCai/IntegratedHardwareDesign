@@ -28,12 +28,14 @@ reg [3:0] cache_dirty_way_0  [0 : (1<<C_INDEX)-1];
 reg [3:0] cache_dirty_way_1 [0 : (1<<C_INDEX)-1];
 reg [T_WIDTH-1:0] cache_tag_way_0  [0 : (1<<C_INDEX) - 1];
 reg [T_WIDTH-1:0] cache_tag_way_1 [0 : (1<<C_INDEX) - 1];
-reg [31:0] cache_tag_way_1cache_block_way_0 [0 : (1<<C_INDEX) - 1];
-reg [31:0] cache_tag_way_1cache_block_way_1 [0 : (1<<C_INDEX) - 1];
+reg [31:0] cache_block_way_0 [0 : (1<<C_INDEX) - 1];
+reg [31:0] cache_block_way_1 [0 : (1<<C_INDEX) - 1];
 wire [C_INDEX-1:0] index = p_a[C_INDEX+1 : 2];
 wire [T_WIDTH-1:0] tag = p_a[A_WIDTH-1 : C_INDEX+2];
 
-reg [WAY_CNT-2:0] pLRU;//保存伪LRU算法要用的最近使用信息
+reg [1:0] pLRU;//保存伪LRU算法要用的最近使用信息
+//错误：组合逻辑的快选择，不可以直接更新plru
+reg [1:0] pLRU_temp;
 
 //write to cache
 integer i;
@@ -45,73 +47,86 @@ always@(posedge clk or negedge clrn)begin
             cache_valid_way_1[i] <= 4'b0;
         end
     end else if(c_write  & ~flush_except & ~no_dcache) begin
-            cache_valid_way_0 [index] <= p_wen;
+        case(cache_way_switch)
+        0:cache_valid_way_0 [index] <= p_wen;
+        1:cache_valid_way_1 [index] <= p_wen;
+        endcase
+            
         end
 end
 always@(posedge clk)begin
     if(c_write & ~flush_except & ~no_dcache) begin
-        cache_tag_way_0 [index] <= tag;
         case(cache_way_switch)
+        //错误0105tag也需要分情况
             0:begin
+            cache_tag_way_0 [index] <= tag;
             case(p_wen)
-                4'b1111: cache_tag_way_1cache_block_way_0[index] <= c_din; //SW
-                4'b1100: cache_tag_way_1cache_block_way_0[index][31:16] <= c_din[31:16]; //SH
-                4'b0011: cache_tag_way_1cache_block_way_0[index][15:0] <= c_din[15:0];
-                4'b1000: cache_tag_way_1cache_block_way_0[index][31:24] <=      [31:24]; //SB
-                4'b0100: cache_tag_way_1cache_block_way_0[index][23:16] <= c_din[23:16];
-                4'b0010: cache_tag_way_1cache_block_way_0[index][15:8] <= c_din[15:8];
-                4'b0001: cache_tag_way_1cache_block_way_0[index][7:0] <= c_din[7:0];
-                default: cache_tag_way_1cache_block_way_0[index] <= cache_tag_way_1cache_block_way_0[index];
+                4'b1111: cache_block_way_0[index] <= c_din; //SW
+                4'b1100: cache_block_way_0[index][31:16] <= c_din[31:16]; //SH
+                4'b0011: cache_block_way_0[index][15:0] <= c_din[15:0];
+                4'b1000: cache_block_way_0[index][31:24] <=  c_din[31:24]; //SB
+                4'b0100: cache_block_way_0[index][23:16] <= c_din[23:16];
+                4'b0010: cache_block_way_0[index][15:8] <= c_din[15:8];
+                4'b0001: cache_block_way_0[index][7:0] <= c_din[7:0];
+                default: cache_block_way_0[index] <= cache_block_way_0[index];
             endcase
             end
             1:begin
+            cache_tag_way_1 [index] <= tag;
                 case(p_wen)
-                4'b1111: cache_tag_way_1cache_block_way_1[index] <= c_din; //SW
-                4'b1100: cache_tag_way_1cache_block_way_1[index][31:16] <= c_din[31:16]; //SH
-                4'b0011: cache_tag_way_1cache_block_way_1[index][15:0] <= c_din[15:0];
-                4'b1000: cache_tag_way_1cache_block_way_1[index][31:24] <= c_din[31:24]; //SB
-                4'b0100: cache_tag_way_1cache_block_way_1[index][23:16] <= c_din[23:16];
-                4'b0010: cache_tag_way_1cache_block_way_1[index][15:8] <= c_din[15:8];
-                4'b0001: cache_tag_way_1cache_block_way_1[index][7:0] <= c_din[7:0];
-                default: cache_tag_way_1cache_block_way_1[index] <= cache_tag_way_1cache_block_way_1[index];
+                4'b1111: cache_block_way_1[index] <= c_din; //SW
+                4'b1100: cache_block_way_1[index][31:16] <= c_din[31:16]; //SH
+                4'b0011: cache_block_way_1[index][15:0] <= c_din[15:0];
+                4'b1000: cache_block_way_1[index][31:24] <= c_din[31:24]; //SB
+                4'b0100: cache_block_way_1[index][23:16] <= c_din[23:16];
+                4'b0010: cache_block_way_1[index][15:8] <= c_din[15:8];
+                4'b0001: cache_block_way_1[index][7:0] <= c_din[7:0];
+                default: cache_block_way_1[index] <= cache_block_way_1[index];
             endcase
             end
         endcase
     end
 end
 always @(posedge clk) begin
-        if(clrn) begin
-            pLRU <= 1'b0;
+    //严重bug，没有取反导致plru恒不变
+        if(~clrn) begin
+            pLRU <= 0;
+            pLRU_temp<=0;
         end
         else begin
-            if(p_strobe & hit) begin
+            //错误0105 要判断是否为dcache
+            if(p_strobe & cache_hit& ~no_dcache) begin
                 if     (hit_way==0) begin
-                    pLRU[0] <= 1'b1;
+                    pLRU_temp <= 1;
                 end
                 else if(hit_way==1) begin
-                    pLRU[0] <= 1'b0;
+                    pLRU_temp <= 0;
                 end
             end
         end
     end
+always@(negedge clk)begin
+    if(~p_strobe)pLRU<=pLRU_temp;
+end
 //read from cache
 //wire valid = ((cache_valid_way_0 [index] & p_ren) == p_ren)||((cache_valid_way_01[index] & p_ren) == p_ren); //cache_valid_way_0  should be "larger" than p_ren, 1100 & 1000 = 1000 √ 1000 & 1110 = 1000 ×
 //wire [T_WIDTH-1 : 0] tagout = cache_tag_way_0 [index];
-wire [31:0] c_dout = hit ? (hit_way==0 ? cache_block_way_0[index] :
+wire [31:0] c_dout = cache_hit ? (hit_way==0 ? cache_block_way_0[index] :
                              hit_way==1 ? cache_block_way_1[index] : 0) : 0;
 
 //cache control
 wire cache_hit =( (((cache_valid_way_0 [index] & p_ren) == p_ren) & (cache_tag_way_0 [index] == tag))|
 (((cache_valid_way_1[index] & p_ren) == p_ren) & (cache_tag_way_1[index] == tag)) )& ~flush_except ;//hit
 wire cache_miss = ~cache_hit;
-wire hit_way=(cache_valid_way_0 [index] & tag==cache_tag_way_0 [index]) ? 0 :
-                      (cache_valid_way_1[index] & tag==cache_tag_way_1[index]) ? 1 : 0;
+//错误0106 valid 判断meiyou上面一致
+wire [1:0]hit_way=(((cache_valid_way_0 [index] & p_ren) == p_ren) & (cache_tag_way_0 [index] == tag)) ? 0 :
+                      (((cache_valid_way_1[index] & p_ren) == p_ren) & (cache_tag_way_1[index] == tag)) ? 1 : 0;
 wire [1:0] cache_way_switch;  //被替换的路号
 assign cache_way_switch =  ~pLRU[0] ? 0 : 1;
 wire miss_cache_way_dirty;
     assign miss_cache_way_dirty = cache_way_switch==0 ? cache_dirty_way_0[index] :
                                    cache_way_switch==1 ? cache_dirty_way_1[index] :0;
-wire [TAG_WIDTH-1:0] miss_cache_way_tag;
+wire [T_WIDTH-1:0] miss_cache_way_tag;
 assign miss_cache_way_tag = cache_way_switch==0 ? cache_tag_way_0[index] :
                 cache_way_switch==1 ? cache_tag_way_1[index] : 0;
 wire [31:0] miss_dirty_block;
@@ -125,7 +140,7 @@ assign read = ~write;
 
 assign m_din = p_dout;
 //??cache???????????????
-assign m_a = (p_a[31:16] == 16'hbfaf) ? {16'h1faf,p_a[15:0]}: p_a; 
+assign m_a = p_a; 
 assign m_rw = p_strobe & p_rw; //write through
 assign m_strobe = p_strobe & (p_rw | cache_miss);
 assign p_ready = ~p_rw & cache_hit | (cache_miss | p_rw) & m_ready;
@@ -135,4 +150,4 @@ wire sel_out = cache_hit;
 wire [31:0] c_din = sel_in ? p_dout : m_dout;
 assign p_din = sel_out ? c_dout :m_dout;
 
-endmodule-
+endmodule

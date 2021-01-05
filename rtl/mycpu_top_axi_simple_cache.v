@@ -96,7 +96,7 @@ module mycpu_topsimplecache(
 
 	wire rst,clk;
 	assign clk=aclk;
-    assign rst=aresetn;
+    assign rst=~aresetn;
 	
     wire [31:0]instrF;
     wire [31:0]pcF;
@@ -117,7 +117,7 @@ module mycpu_topsimplecache(
 	wire flushE,equalD;
 	wire stallD,stallE,stallM,stallW,flushM,flushW;
 	wire writeTo31E,BJalM;
-    wire [7:0]expectTypeM;
+    wire [31:0]excepttypeM;
     wire [31:0] readdataM;
     wire memenM;
 	wire flush_except=|excepttypeM;
@@ -136,6 +136,7 @@ module mycpu_topsimplecache(
 	wire[3:0] m_sel,d_wen;
 	wire stallreq_from_if,stallreq_from_mem;
 	wire [31:0] m_i_a,m_d_a;
+	wire [31:0]instrD;
 
 
 
@@ -157,68 +158,77 @@ module mycpu_topsimplecache(
 
 	// these modules use your own
 	controller c(
+		instrD,
 		clk,rst,
-		//取指令阶段信�?
+		//取指令阶段信�?
 		alucontrolD,
 		opD,functD,InstrRtD,
 		pcsrcD,branchD,jumpD,jrD,jalD,balD,
 		
-        equalD,
+        equalD,stallD,
+		eretD,syscallD,breakD,invalidD,
 
-		//运算级信�?
-		flushE,stallE,
+		//运算级信�?
+		flushE,stallE,BJalE,
 		memtoregE,alusrcE,
 		regdstE,regwriteE,	writeTo31E,
 		alucontrolE,
+		cp0readE,
 
-		//内存访问级信�?
+		//内存访问级信�?
 		memtoregM,memwriteM,
 		regwriteM,HLwriteM,BJalM,memenM,alucontrolM,
 		stallM,flushM,
-		//写回级信�?
+		cp0weM,
+		//写回级信�?
 		memtoregW,regwriteW,
-		HLwriteW,stallW,flushW
+		HLwriteW,stallW,flushW,
+		cp0weW
 	);
 	datapath dp(
 		clk,rst,
-		//取指令阶段信�?
+		//取指令阶段信�?
 		pcF,
 		instrF,
 		//指令译码阶段信号
 		alucontrolD,
 		pcsrcD,branchD,
 		jumpD,jrD,jalD,balD,
+		eretD,syscallD,breakD,invalidD,
 		equalD,
 		opD,functD,
-		InstrRtD,
-		//运算级信�?
+		InstrRtD,instrD,
+		//运算级信�?
 		memtoregE,
-		alusrcE,regdstE,
-		regwriteE,writeTo31E,
+		alusrcE,regdstE,BJalE,
+		regwriteE,writeTo31E,cp0readE,
 		alucontrolE,
 		flushE,
-		//内存访问级信�?
+		//内存访问级信�?
 		memtoregM,
 		regwriteM,
 		HLwriteM,BJalM,
         //错误：expectTypeM位置错误
-		aluoutM,writedataM,expectTypeM,alucontrolM,
-		readdataM,readEnM,writeEnM,
+		aluoutM,writedataM,excepttypeM,alucontrolM,
+		readdataM,cp0weM,readEnM,writeEnM,
 		//////////////////////////////////////////////
 		//TODO:添加
 		data_sram_size,
 		/////////////////////////////////////////////////
-		flushM,
-		//写回级信�?
+		flushM,flush_except,
+		//写回级信�?
 		memtoregW,
 		regwriteW,
 		HLwriteW,
+		cp0weW,
 		flushW,
 		debug_wb_pc,
 		debug_wb_rf_wen,
 		debug_wb_rf_wnum,
 		debug_wb_rf_wdata,
-
+		stallreq_from_if,
+		stallreq_from_mem,
+		stallreq_from_ifW,
 
 
 
@@ -239,13 +249,14 @@ module mycpu_topsimplecache(
 		data_paddr,
 		no_dcache    //是否经过d cache
 	);
+	//错误0105 书上cache逻辑是低位有效
 	i_cache_simple #(32,15) ic (
-		.clk(clk),.clrn(rst),
+		.clk(clk),.clrn(~rst),
 		.p_a(inst_sram_addr), //input
 		.p_din(inst_sram_rdata), //output
 		.p_strobe(inst_sram_en), //input
 		.p_ready(i_ready), //output
-		.cache_miss(cache_miss), //output
+		.cache_miss(inst_miss), //output
 		.flush_except(flush_except), //input
 		.m_a(m_i_a), //output
 		.m_dout(mem_data), //input
@@ -253,7 +264,7 @@ module mycpu_topsimplecache(
 		.m_ready(m_i_ready) //input
 	);
 	d_cache_simple#(32,15) dc (
-		.clk(clk),.clrn(rst), 
+		.clk(clk),.clrn(~rst), 
 		.p_a(data_sram_addr), //input
 		.p_dout(data_sram_wdata), //input
 		.p_strobe(data_sram_en), //input
@@ -299,12 +310,12 @@ module mycpu_topsimplecache(
 	// // 
 	// assign m_fetch = inst_sram_en & inst_miss; //if inst_miss equals 0, disable the fetch strobe
 	// assign m_ld_st = data_sram_en;
-	//添加cache后需要更新�?�辑
+	//添加cache后需要更新�?�辑
 	assign sel_i = inst_miss;//sel_i就是icache缺失
 	assign m_addr = sel_i ? m_i_a : m_d_a;
-	assign inst_sram_rdata = mem_data;
-	assign data_sram_rdata = mem_data;
-	assign mem_st_data = data_sram_wdata;
+	//assign inst_sram_rdata = mem_data;
+	//assign data_sram_rdata = mem_data;
+	//assign mem_st_data = data_sram_wdata;
 	// use select signal
 	assign mem_access = sel_i ? m_fetch : m_ld_st; 
 	assign mem_size = sel_i ? 2'b10 : data_sram_size;
@@ -316,8 +327,8 @@ module mycpu_topsimplecache(
 	assign m_d_ready = mem_ready & ~sel_i;
 
 	//
-	assign stallreq_from_if = ~m_i_ready;
-	assign stallreq_from_mem = data_sram_en & ~m_d_ready;
+	assign stallreq_from_if = ~i_ready;
+	assign stallreq_from_mem = data_sram_en & ~d_ready;
 
 	axi_interface interface(
 		.clk(aclk),
