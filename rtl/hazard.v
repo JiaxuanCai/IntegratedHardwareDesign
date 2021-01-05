@@ -64,6 +64,7 @@ module hazard(
 	output lwstallD,branchstallD,
 	input[4:0] rdW,
 	input cp0weW, //协处理器写信�?
+	input wire stallreq_from_if, stallreq_from_mem,
 	output flush_except
 );
 
@@ -126,13 +127,13 @@ module hazard(
 	assign #1 stallF = stallD;
 
     //D级暂�?
-	assign #1 stallD = lwstallD | branchstallD | jrstallD | mut_div_stallE ;
+	assign #1 stallD = lwstallD | branchstallD | jrstallD | mut_div_stallE | stallreq_from_if | stallreq_from_mem;
 
 	//E级暂�?
-	assign #1 stallE = mut_div_stallE ;
+	assign #1 stallE = mut_div_stallE | stallreq_from_mem;
 
 	//M级暂�?
-	assign #1 stallM = 0;
+	assign #1 stallM = stallreq_from_mem;
 	
 	//W级暂�?
 	assign #1 stallW=0;
@@ -153,6 +154,6 @@ module hazard(
 	assign #1 flushM=flushF;
 	
 	//W级刷�?
-	assign #1 flushW=flushF;
+	assign #1 flushW=flushF | stallreq_from_mem;
 
 endmodule

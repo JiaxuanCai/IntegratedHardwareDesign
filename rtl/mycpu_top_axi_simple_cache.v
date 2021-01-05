@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 `include "defines.vh"
 
-module mycpu_top(
+module mycpu_topsimplecache(
 	input wire[5:0] int,
 	input wire aclk,aresetn,
 	
@@ -158,30 +158,30 @@ module mycpu_top(
 	// these modules use your own
 	controller c(
 		clk,rst,
-		//取指令阶段信号
+		//取指令阶段信�?
 		alucontrolD,
 		opD,functD,InstrRtD,
 		pcsrcD,branchD,jumpD,jrD,jalD,balD,
 		
         equalD,
 
-		//运算级信号
+		//运算级信�?
 		flushE,stallE,
 		memtoregE,alusrcE,
 		regdstE,regwriteE,	writeTo31E,
 		alucontrolE,
 
-		//内存访问级信号
+		//内存访问级信�?
 		memtoregM,memwriteM,
 		regwriteM,HLwriteM,BJalM,memenM,alucontrolM,
 		stallM,flushM,
-		//写回级信号
+		//写回级信�?
 		memtoregW,regwriteW,
 		HLwriteW,stallW,flushW
 	);
 	datapath dp(
 		clk,rst,
-		//取指令阶段信号
+		//取指令阶段信�?
 		pcF,
 		instrF,
 		//指令译码阶段信号
@@ -191,13 +191,13 @@ module mycpu_top(
 		equalD,
 		opD,functD,
 		InstrRtD,
-		//运算级信号
+		//运算级信�?
 		memtoregE,
 		alusrcE,regdstE,
 		regwriteE,writeTo31E,
 		alucontrolE,
 		flushE,
-		//内存访问级信号
+		//内存访问级信�?
 		memtoregM,
 		regwriteM,
 		HLwriteM,BJalM,
@@ -209,7 +209,7 @@ module mycpu_top(
 		data_sram_size,
 		/////////////////////////////////////////////////
 		flushM,
-		//写回级信号
+		//写回级信�?
 		memtoregW,
 		regwriteW,
 		HLwriteW,
@@ -299,7 +299,7 @@ module mycpu_top(
 	// // 
 	// assign m_fetch = inst_sram_en & inst_miss; //if inst_miss equals 0, disable the fetch strobe
 	// assign m_ld_st = data_sram_en;
-	//添加cache后需要更新逻辑
+	//添加cache后需要更新�?�辑
 	assign sel_i = inst_miss;//sel_i就是icache缺失
 	assign m_addr = sel_i ? m_i_a : m_d_a;
 	assign inst_sram_rdata = mem_data;

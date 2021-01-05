@@ -21,7 +21,7 @@
 `include "defines.vh"
 
 module mycpu_top(
-	input wire[5:0] ext_int,
+	input wire[5:0] int,
 	input wire aclk,aresetn,
 	
 	 // axi port
@@ -155,7 +155,7 @@ module mycpu_top(
 	// these modules use your own
 	controller c(
 		instrD,
-		clk,rst,
+		~clk,rst,
 		//取指令阶段信号
 		alucontrolD,
 		opD,functD,InstrRtD,
@@ -182,7 +182,7 @@ module mycpu_top(
 		cp0weW
 	);
 	datapath dp(
-		clk,rst,
+		~clk,rst,
 		//取指令阶段信�?
 		pcF,
 		instrF,
@@ -220,6 +220,8 @@ module mycpu_top(
 		debug_wb_rf_wen,
 		debug_wb_rf_wnum,
 		debug_wb_rf_wdata,
+		stallreq_from_if,
+		stallreq_from_mem,
 		rsE,rtE,rdE,
 	    rsD,rtD,rdD,
 		lwstallD,branchstallD,

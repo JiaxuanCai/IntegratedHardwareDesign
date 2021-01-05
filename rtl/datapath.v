@@ -52,7 +52,7 @@ module datapath(
 	output wire [3:0]regenW,
 	output wire [4:0]writeregW,
 	output wire [31:0]resultW,
-	
+	input wire stallreq_from_if, stallreq_from_mem,
 	
 
 	output wire [4:0] rsE,rtE,rdE,
@@ -186,6 +186,8 @@ module datapath(
 		.branchstallD(branchstallD),
 		.rdW(rdW),
 		.cp0weW(cp0weW),
+		.stallreq_from_if(stallreq_from_if),
+		.stallreq_from_mem(stallreq_from_mem),
 		.flush_except(flush_except)
 	);
 
