@@ -19,7 +19,7 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 `include "defines.vh"
-
+//错误0106：读取指令地址等都没有错误，值是错的，jal地址错误。换了之前的测试文件（0.02）的obj3就没有问题
 module mycpu_topsimplecache(
 	input wire[5:0] int,
 	input wire aclk,aresetn,
@@ -120,7 +120,7 @@ module mycpu_topsimplecache(
     wire [31:0]excepttypeM;
     wire [31:0] readdataM;
     wire memenM;
-	wire flush_except=|excepttypeM;
+	//wire flush_except=|excepttypeM;
 
 	// the follow definitions are between controller and datapath.
 	// also use some of them  link the IPcores
@@ -128,14 +128,14 @@ module mycpu_topsimplecache(
 	//cache mux signal
 	wire cache_miss,sel_i;
 	wire[31:0] i_addr,d_addr,m_addr;
-	wire m_fetch,m_ld_st,mem_access;
-	wire mem_write,m_st;
-	wire mem_ready,m_i_ready,m_d_ready,i_ready,d_ready;
-	wire[31:0] mem_st_data,mem_data;
+	wire m_fetch,m_ld_st,mem_access,m_ld_st_cache;
+	wire mem_write,m_st,m_st_cache;
+	wire mem_ready,m_i_ready,m_d_ready,i_ready;
+	wire[31:0] mem_st_data,mem_data,mem_st_data_cache;
 	wire[1:0] mem_size,d_size;// size not use
 	wire[3:0] m_sel,d_wen;
 	wire stallreq_from_if,stallreq_from_mem;
-	wire [31:0] m_i_a,m_d_a;
+	wire [31:0] m_i_a,m_d_a,m_d_a_cache;
 	wire [31:0]instrD;
 
 
@@ -153,7 +153,7 @@ module mycpu_topsimplecache(
 	assign data_sram_wen = writeEnM;
 	assign data_sram_addr = data_paddr;
 	assign data_sram_wdata = writedataM;
-	assign readdataM = data_sram_rdata; // use your own signal from M stage
+	assign readdataM = no_dcache?mem_data:data_sram_rdata; // use your own signal from M stage
 
 
 	// these modules use your own
@@ -263,28 +263,54 @@ module mycpu_topsimplecache(
 		.m_strobe(m_fetch), //output
 		.m_ready(m_i_ready) //input
 	);
-	d_cache_simple#(32,15) dc (
-		.clk(clk),.clrn(~rst), 
-		.p_a(data_sram_addr), //input
-		.p_dout(data_sram_wdata), //input
-		.p_strobe(data_sram_en), //input
-		.p_rw(data_sram_write), //input
-		.p_wen(data_sram_wen),//input
-		.p_ren(readEnM), //input
-		.flush_except(flush_except), //input
-		//TODO
-		.no_dcache(no_dcache),
-		.p_ready(d_ready), //output
-		.p_din(data_sram_rdata), //output
+	// d_cache_arc#(32,15) dc (
+	// 	.clk(clk),.clrn(~rst), 
+	// 	.p_a(data_sram_addr), //input
+	// 	.p_dout(data_sram_wdata), //input
+	// 	.p_strobe(data_sram_en), //input
+	// 	.p_rw(data_sram_write), //input
+	// 	.p_wen(data_sram_wen),//input
+	// 	.p_ren(readEnM), //input
+	// 	.flush_except(flush_except), //input
+	// 	//TODO
+	// 	.no_dcache(no_dcache),
+	// 	.p_ready(d_ready), //output
+	// 	.p_din(data_sram_rdata), //output
 		
-		.m_dout(mem_data), //input
-		.m_ready(m_d_ready), //input
-		.m_din(mem_st_data), //output
-		.m_a(m_d_a), //output
-		.m_strobe(m_ld_st), //output
-		.m_rw(m_st) //output
+	// 	.m_dout(mem_data), //input
+	// 	.m_ready(m_d_ready), //input
+	// 	.m_din(mem_st_data), //output
+	// 	.m_a(m_d_a), //output
+	// 	.m_strobe(m_ld_st), //output
+	// 	.m_rw(m_st) //output
+	// );
+	d_cache_arc dc (
+		.clk(clk),.rst(rst), 
+		.cpu_data_req(data_sram_en),
+		.cpu_data_wr(data_sram_write),
+		//错误0106：使用了en信号而不是size
+		.cpu_data_size(data_sram_size),
+		.cpu_data_addr(data_sram_addr),
+		//错误0106使用了data_sram_write
+		.cpu_data_wdata(data_sram_wdata),
+		.cpu_data_rdata(data_sram_rdata),
+		.cpu_data_addr_ok(),
+		.cpu_data_data_ok(d_ready_cache),
+		.no_dcache(no_dcache),.flush_except(flush_except),
+
+		.cache_data_req(m_ld_st_cache),
+		.cache_data_wr(m_st_cache),
+		.cache_data_size(),
+		.cache_data_addr(m_d_a_cache),
+		.cache_data_wdata(mem_st_data_cache),
+		.cache_data_rdata(mem_data),
+		.cache_data_addr_ok(m_d_ready),
+		.cache_data_data_ok(m_d_ready)
+
+
+		//.flush_except(flush_except), //input
 	);
-	
+	wire d_ready=no_dcache?m_d_ready:d_ready_cache;
 
 	// use a inst_miss signal to denote that the instruction is not loadssss
 	// reg inst_miss;
@@ -311,16 +337,22 @@ module mycpu_topsimplecache(
 	// assign m_fetch = inst_sram_en & inst_miss; //if inst_miss equals 0, disable the fetch strobe
 	// assign m_ld_st = data_sram_en;
 	//添加cache后需要更新�?�辑
+	//错误0106 严重bug，不经过cache要重写逻辑
+	assign m_d_a=no_dcache?data_sram_addr:m_d_a_cache;
+	assign m_st=no_dcache?memwriteM:m_st_cache;
+	assign mem_st_data=no_dcache?data_sram_wdata:mem_st_data_cache;
+	assign m_ld_st=no_dcache?data_sram_en:m_ld_st_cache;
 	assign sel_i = inst_miss;//sel_i就是icache缺失
 	assign m_addr = sel_i ? m_i_a : m_d_a;
 	//assign inst_sram_rdata = mem_data;
 	//assign data_sram_rdata = mem_data;
 	//assign mem_st_data = data_sram_wdata;
 	// use select signal
-	assign mem_access = sel_i ? m_fetch : m_ld_st; 
+	assign mem_access = sel_i ? m_fetch : (m_ld_st); 
 	assign mem_size = sel_i ? 2'b10 : data_sram_size;
 	assign m_sel = sel_i ? 4'b1111 : data_sram_wen;
-	assign mem_write = sel_i ? 1'b0 : data_sram_write;
+	//错误0106写回这里逻辑需要变
+	assign mem_write = sel_i ? 1'b0 : m_st;
 
 	//demux
 	assign m_i_ready = mem_ready & sel_i;

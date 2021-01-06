@@ -18,8 +18,13 @@ module maindec(
     );
 	reg[6:0] controls;
 	assign {regwrite,regdst,alusrc,branch,memwrite,memtoreg,jump} = controls;
-	assign memen = (op == `EXE_LB)||(op == `EXE_LBU)||(op == `EXE_LH)||
-                (op == `EXE_LHU)||(op == `EXE_LW)||(op == `EXE_SB)||(op == `EXE_SH)||(op == `EXE_SW)&& ~stallD;
+	//错误0106：极其严重错误，括号加错导致逻辑错误，很难找到的bug。导致取值与取数据冲突，从而取出错误的指令
+	/*[5961634 ns] Error!!!
+    reference: PC = 0xbfc00d84, wb_rf_wnum = 0x0b, wb_rf_wdata = 0x00000000
+    mycpu    : PC = 0xbfc00d7c, wb_rf_wnum = 0x08, wb_rf_wdata = 0xffffffff
+	*/
+	assign memen =( (op == `EXE_LB)||(op == `EXE_LBU)||(op == `EXE_LH)||
+                (op == `EXE_LHU)||(op == `EXE_LW)||(op == `EXE_SB)||(op == `EXE_SH)||(op == `EXE_SW))&& ~stallD;
 
 	//op觉得控制信号
 	always @(*) begin
