@@ -19,9 +19,9 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 `include "defines.vh"
-//错误0106：读取指令地址等都没有错误，值是错的，jal地址错误。换了之前的测试文件（0.02）的obj3就没有问题
-module mycpu_topsimplecache(
-	input wire[5:0] int,
+//错误0106：读取指令地�?等都没有错误，�?�是错的，jal地址错误。换了之前的测试文件�?0.02）的obj3就没有问�?
+module mycpu_top(
+	input wire[5:0] ext_int,
 	input wire aclk,aresetn,
 	
 	 // axi port
@@ -160,7 +160,7 @@ module mycpu_topsimplecache(
 	controller c(
 		instrD,
 		clk,rst,
-		//取指令阶段信�?
+		//取指令阶段信�??
 		alucontrolD,
 		opD,functD,InstrRtD,
 		pcsrcD,branchD,jumpD,jrD,jalD,balD,
@@ -168,26 +168,26 @@ module mycpu_topsimplecache(
         equalD,stallD,
 		eretD,syscallD,breakD,invalidD,
 
-		//运算级信�?
+		//运算级信�??
 		flushE,stallE,BJalE,
 		memtoregE,alusrcE,
 		regdstE,regwriteE,	writeTo31E,
 		alucontrolE,
 		cp0readE,
 
-		//内存访问级信�?
+		//内存访问级信�??
 		memtoregM,memwriteM,
 		regwriteM,HLwriteM,BJalM,memenM,alucontrolM,
 		stallM,flushM,
 		cp0weM,
-		//写回级信�?
+		//写回级信�??
 		memtoregW,regwriteW,
 		HLwriteW,stallW,flushW,
 		cp0weW
 	);
 	datapath dp(
 		clk,rst,
-		//取指令阶段信�?
+		//取指令阶段信�??
 		pcF,
 		instrF,
 		//指令译码阶段信号
@@ -198,13 +198,13 @@ module mycpu_topsimplecache(
 		equalD,
 		opD,functD,
 		InstrRtD,instrD,
-		//运算级信�?
+		//运算级信�??
 		memtoregE,
 		alusrcE,regdstE,BJalE,
 		regwriteE,writeTo31E,cp0readE,
 		alucontrolE,
 		flushE,
-		//内存访问级信�?
+		//内存访问级信�??
 		memtoregM,
 		regwriteM,
 		HLwriteM,BJalM,
@@ -216,7 +216,7 @@ module mycpu_topsimplecache(
 		data_sram_size,
 		/////////////////////////////////////////////////
 		flushM,flush_except,
-		//写回级信�?
+		//写回级信�??
 		memtoregW,
 		regwriteW,
 		HLwriteW,
@@ -249,7 +249,7 @@ module mycpu_topsimplecache(
 		data_paddr,
 		no_dcache    //是否经过d cache
 	);
-	//错误0105 书上cache逻辑是低位有效
+	//错误0105 书上cache逻辑是低位有�?
 	i_cache_simple #(32,15) ic (
 		.clk(clk),.clrn(~rst),
 		.p_a(inst_sram_addr), //input
@@ -337,7 +337,7 @@ module mycpu_topsimplecache(
 	// assign m_fetch = inst_sram_en & inst_miss; //if inst_miss equals 0, disable the fetch strobe
 	// assign m_ld_st = data_sram_en;
 	//添加cache后需要更新�?�辑
-	//错误0106 严重bug，不经过cache要重写逻辑
+	//错误0106 严重bug，不经过cache要重写�?�辑
 	assign m_d_a=no_dcache?data_sram_addr:m_d_a_cache;
 	assign m_st=no_dcache?memwriteM:m_st_cache;
 	assign mem_st_data=no_dcache?data_sram_wdata:mem_st_data_cache;
@@ -348,10 +348,10 @@ module mycpu_topsimplecache(
 	//assign data_sram_rdata = mem_data;
 	//assign mem_st_data = data_sram_wdata;
 	// use select signal
-	assign mem_access = sel_i ? m_fetch : (m_ld_st); 
+	assign mem_access = sel_i ? m_fetch : (m_ld_st&data_sram_en); 
 	assign mem_size = sel_i ? 2'b10 : data_sram_size;
 	assign m_sel = sel_i ? 4'b1111 : data_sram_wen;
-	//错误0106写回这里逻辑需要变
+	//错误0106写回这里逻辑�?要变
 	assign mem_write = sel_i ? 1'b0 : m_st;
 
 	//demux
