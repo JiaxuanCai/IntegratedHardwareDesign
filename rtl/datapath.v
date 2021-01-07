@@ -317,9 +317,8 @@ module datapath(
 	//HL寄存�?
 	hilo_reg hilorrg(clk,rst,HLwriteW,HLOutW[63:32],HLOutW[31:0],HLregW[63:32],HLregW[31:0]);
 	//错误0104 环路问题badvaddr
-	wire stall_cp0 = stallreq_from_if | stallD;
 	cp0_reg cp0(
-		.clk(clk),.rst(rst),.stall_cp0(stall_cp0),.we_i(cp0weW),.waddr_i(rdW),.raddr_i(rdE),
+		.clk(clk),.rst(rst),.we_i(cp0weW),.waddr_i(rdW),.raddr_i(rdE),
 		.data_i(aluoutW),.int_i(6'b000000),.excepttype_i(exceptTypeM),
 		.current_inst_addr_i(pcM),.is_in_delayslot_i(is_in_delayslotM),
 		.bad_addr_i(bad_addrM),.data_o(cp0dataE),.count_o(count_oW),

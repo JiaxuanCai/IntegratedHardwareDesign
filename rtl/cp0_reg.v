@@ -24,7 +24,6 @@
 module cp0_reg(
 	input wire clk,
 	input wire rst,
-	input wire stall_cp0,
 	input wire we_i,
 	input[4:0] waddr_i,
 	input[4:0] raddr_i,
