@@ -6,8 +6,8 @@ module datapath(
 	input wire clk,rst,//时钟信号 重置信号
 	
 	//取指令阶段信�?
-	output wire[31:0] pcF, //取指令级地址寄存器
-	input wire[31:0] instrF,// 取指令级的指令
+	output wire[31:0] pcF, //取指令级地址寄存�?
+	input wire[31:0] instrF,// 取指令级的指�?
 
 	//指令译码阶段信号
 	//错误：没有引入alucontrolD
@@ -196,7 +196,7 @@ module datapath(
 	mux2 #(32) pcbrmux(pcplus4F,pcbranchD,pcsrcD,pcnextbrFD);  //地址计算部分
 	//mux2 #(32) pcmux(pcnextbrFD, {pcplus4D[31:28],instrD[25:0],2'b00}, jumpD, pcnextFD);  //地址计算部分
 	//jr�?1直接跳寄存器值，否则如果jump�?1跳拼接�?�，否则正常+4
-	//错误：必须选择数据前推后的srca2D
+	//错误：必须�?�择数据前推后的srca2D
 	assign pcnextFD=jrD?srca2D:
 						(jumpD|jalD)?{pcplus4D[31:28],instrD[25:0],2'b00}:pcnextbrFD;
 	
@@ -214,7 +214,7 @@ module datapath(
 	assign is_in_delayslotF = (jumpD | jalD | jrD | balD | branchD);
 	
 	//译指触发�?
-	//错误：地址计算部分不能刷新
+	//错误：地�?计算部分不能刷新
 	flopenrc #(32) r1D(clk,rst,~stallD,flushD,pcplus4F,pcplus4D);  //地址计算部分
 	flopenrc #(32) r2D(clk,rst,~stallD,flushD,instrF,instrD);
 	flopenrc #(32) r3D(clk,rst,~stallD,flushD,pcF,pcD);

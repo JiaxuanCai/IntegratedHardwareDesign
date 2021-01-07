@@ -63,7 +63,7 @@ module mycpu_top(
 	wire regdstE,alusrcE,pcsrcD,memtoregE,memtoregM,memtoregW;
 	wire regwriteE,regwriteM,regwriteW;
 	wire HLwriteM,HLwriteW;
-	//错误：这里没有加，导致错误，一定要看warning
+	//错误：这里没有加，导致z,�?定要看warning
 	wire [7:0] alucontrolD;
 	wire [7:0] alucontrolE,alucontrolM;
 	wire flushE,equalD;
@@ -72,7 +72,7 @@ module mycpu_top(
     wire [31:0]exceptTypeM;
 	wire cp0readE,cp0weM,cp0weW;
 	wire flush_except;
-    //严重错误：忘记写导致readdataM只有1位
+    //严重错误：忘记写导致readdataM只有1�?
     wire [31:0] readdataM;
     wire memenM;
 	wire eretD,syscallD,breakD,invalidD;
@@ -84,7 +84,7 @@ module mycpu_top(
 
     assign data_sram_en=memenM&~(|exceptTypeM);
     assign data_sram_wen=writeEnM;
-    //错误：地址转换，de了五个小时
+    //错误：地�?转换，de了五个小�?
     assign data_sram_addr=data_paddr;
     assign data_sram_wdata=writedataM;
     assign readdataM=data_sram_rdata;
@@ -92,7 +92,7 @@ module mycpu_top(
 	controller c(
 	instrD,
 	~clk,rst,
-	//取指令阶段信号
+	//取指令阶段信�?
 	alucontrolD,
 	opD,functD,InstrRtD,
 	pcsrcD,branchD,jumpD,jrD,jalD,balD,
@@ -118,7 +118,7 @@ module mycpu_top(
 	cp0weW
 );
 
-    //错误：时钟应该取反
+    //错误：时钟应该取�?
 	datapath dp(
 		~clk,rst,
 		//取指令阶段信�?
