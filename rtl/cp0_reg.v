@@ -60,7 +60,6 @@ module cp0_reg(
 			prid_o <= 32'b00000000010011000000000100000010;
 			timer_int_o <= `InterruptNotAssert;
 		end else begin
-			if(~stall_cp0) begin 
 				count_o <= count_o + 1;
 				cause_o[15:10] <= int_i;
 				if(compare_o != `ZeroWord && count_o == compare_o) begin
@@ -195,7 +194,6 @@ module cp0_reg(
 					end
 					default : /* default */;
 				endcase
-			end
 		end
 	end
 
@@ -204,7 +202,6 @@ module cp0_reg(
 			/* code */
 			data_o <= `ZeroWord;
 		end else begin 
-			if(~stall_cp0) begin
 				case (raddr_i)
 					`CP0_REG_COUNT:begin 
 						data_o <= count_o;
@@ -234,7 +231,6 @@ module cp0_reg(
 						data_o <= `ZeroWord;
 					end
 				endcase
-			end
 		end
 	end
 endmodule
